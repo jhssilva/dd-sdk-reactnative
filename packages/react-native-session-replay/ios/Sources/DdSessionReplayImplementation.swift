@@ -30,7 +30,14 @@ public class DdSessionReplayImplementation: NSObject {
     }
 
     @objc
-    public func enable(replaySampleRate: Double, defaultPrivacyLevel: String, customEndpoint: String, resolve:RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
+    public func enable(
+        replaySampleRate: Double,
+        defaultPrivacyLevel: String,
+        customEndpoint: String,
+        startRecordingImmediately: Bool,
+        resolve:RCTPromiseResolveBlock,
+        reject:RCTPromiseRejectBlock
+    ) -> Void {
         var customEndpointURL: URL? = nil
         if (customEndpoint != "") {
             customEndpointURL = URL(string: "\(customEndpoint)/api/v2/replay" as String)
@@ -38,6 +45,7 @@ public class DdSessionReplayImplementation: NSObject {
         var sessionReplayConfiguration = SessionReplay.Configuration(
             replaySampleRate: Float(replaySampleRate),
             defaultPrivacyLevel: buildPrivacyLevel(privacyLevel: defaultPrivacyLevel as NSString),
+            startRecordingImmediately: startRecordingImmediately,
             customEndpoint: customEndpointURL
         )
                     
@@ -52,6 +60,28 @@ public class DdSessionReplayImplementation: NSObject {
             consolePrint("Core instance was not found when initializing Session Replay.", .critical)
         }
 
+        resolve(nil)
+    }
+    
+    @objc
+    public func startRecording(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+        if let core = DatadogSDKWrapper.shared.getCoreInstance() {
+            sessionReplay.startRecording(in: core)
+        } else {
+            consolePrint("Core instance was not found when calling startRecording in Session Replay.", .critical)
+        }
+        
+        resolve(nil)
+    }
+    
+    @objc
+    public func stopRecording(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+        if let core = DatadogSDKWrapper.shared.getCoreInstance() {
+            sessionReplay.stopRecording(in: core)
+        } else {
+            consolePrint("Core instance was not found when calling stopRecording in Session Replay.", .critical)
+        }
+        
         resolve(nil)
     }
     
@@ -74,10 +104,21 @@ internal protocol SessionReplayProtocol {
         with configuration: SessionReplay.Configuration,
         in core: DatadogCoreProtocol
     )
+    
+    func startRecording(in core: DatadogCoreProtocol)
+    func stopRecording(in core: DatadogCoreProtocol)
 }
 
 internal class NativeSessionReplay: SessionReplayProtocol {
     func enable(with configuration: DatadogSessionReplay.SessionReplay.Configuration, in core: DatadogCoreProtocol) {
         SessionReplay.enable(with: configuration, in: core)
+    }
+    
+    func startRecording(in core: any DatadogInternal.DatadogCoreProtocol) {
+        SessionReplay.startRecording(in: core)
+    }
+    
+    func stopRecording(in core: any DatadogInternal.DatadogCoreProtocol) {
+        SessionReplay.stopRecording(in: core)
     }
 }

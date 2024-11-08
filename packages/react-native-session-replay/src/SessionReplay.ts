@@ -34,12 +34,20 @@ export interface SessionReplayConfiguration {
      * Custom server url for sending replay data.
      */
     customEndpoint?: string;
+    /**
+     * Whether the recording should start automatically when the feature is enabled.
+     * When `true`, the recording starts automatically.
+     * when `false` it doesn't, and the recording will need to be started manually.
+     * Default: `true`.
+     */
+    startRecordingImmediately?: boolean;
 }
 
 const DEFAULTS = {
     replaySampleRate: 0,
     defaultPrivacyLevel: SessionReplayPrivacy.MASK,
-    customEndpoint: ''
+    customEndpoint: '',
+    startRecordingImmediately: true
 };
 
 export class SessionReplayWrapper {
@@ -53,6 +61,7 @@ export class SessionReplayWrapper {
         replaySampleRate: number;
         defaultPrivacyLevel: SessionReplayPrivacy;
         customEndpoint: string;
+        startRecordingImmediately: boolean;
     } => {
         if (!configuration) {
             return DEFAULTS;
@@ -60,7 +69,8 @@ export class SessionReplayWrapper {
         const {
             replaySampleRate,
             defaultPrivacyLevel,
-            customEndpoint
+            customEndpoint,
+            startRecordingImmediately
         } = configuration;
         return {
             replaySampleRate:
@@ -74,7 +84,11 @@ export class SessionReplayWrapper {
             customEndpoint:
                 customEndpoint !== undefined
                     ? customEndpoint
-                    : DEFAULTS.customEndpoint
+                    : DEFAULTS.customEndpoint,
+            startRecordingImmediately:
+                startRecordingImmediately !== undefined
+                    ? startRecordingImmediately
+                    : DEFAULTS.startRecordingImmediately
         };
     };
 
@@ -86,14 +100,30 @@ export class SessionReplayWrapper {
         const {
             replaySampleRate,
             defaultPrivacyLevel,
-            customEndpoint
+            customEndpoint,
+            startRecordingImmediately
         } = this.buildConfiguration(configuration);
 
         return this.nativeSessionReplay.enable(
             replaySampleRate,
             defaultPrivacyLevel,
-            customEndpoint
+            customEndpoint,
+            startRecordingImmediately
         );
+    };
+
+    /**
+     * Manually start the recording of the current session.
+     */
+    startRecording = (): Promise<void> => {
+        return this.nativeSessionReplay.startRecording();
+    };
+
+    /**
+     * Manually stop the recording of the current session.
+     */
+    stopRecording = (): Promise<void> => {
+        return this.nativeSessionReplay.stopRecording();
     };
 }
 

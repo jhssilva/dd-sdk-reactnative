@@ -21,4 +21,14 @@ interface SessionReplayWrapper {
         sessionReplayConfiguration: SessionReplayConfiguration,
         sdkCore: SdkCore
     )
+
+    /**
+     * Manually start recording the current session.
+     */
+    fun startRecording(sdkCore: SdkCore)
+
+    /**
+     * Manually stop recording the current session.
+     */
+    fun stopRecording(sdkCore: SdkCore)
 }

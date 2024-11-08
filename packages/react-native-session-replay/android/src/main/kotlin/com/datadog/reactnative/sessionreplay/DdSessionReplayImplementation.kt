@@ -30,12 +30,20 @@ class DdSessionReplayImplementation(
      * @param replaySampleRate The sample rate applied for session replay.
      * @param defaultPrivacyLevel The privacy level used for replay.
      * @param customEndpoint Custom server url for sending replay data.
+     * @param startRecordingImmediately Whether the recording should start immediately.
      */
-    fun enable(replaySampleRate: Double, defaultPrivacyLevel: String, customEndpoint: String, promise: Promise) {
+    fun enable(
+        replaySampleRate: Double,
+        defaultPrivacyLevel: String,
+        customEndpoint: String,
+        startRecordingImmediately: Boolean,
+        promise: Promise
+    ) {
         val sdkCore = DatadogSDKWrapperStorage.getSdkCore() as FeatureSdkCore
         val logger = sdkCore.internalLogger
         val configuration = SessionReplayConfiguration.Builder(replaySampleRate.toFloat())
             .configurePrivacy(defaultPrivacyLevel)
+            .startRecordingImmediately(startRecordingImmediately)
             .addExtensionSupport(ReactNativeSessionReplayExtensionSupport(reactContext, logger))
 
         if (customEndpoint != "") {
@@ -43,6 +51,26 @@ class DdSessionReplayImplementation(
         }
 
         sessionReplayProvider().enable(configuration.build(), sdkCore)
+        promise.resolve(null)
+    }
+
+    /**
+     * Manually start recording the current session.
+     */
+    fun startRecording(promise: Promise) {
+        sessionReplayProvider().startRecording(
+            DatadogSDKWrapperStorage.getSdkCore() as FeatureSdkCore
+        )
+        promise.resolve(null)
+    }
+
+    /**
+     * Manually stop recording the current session.
+     */
+    fun stopRecording(promise: Promise) {
+        sessionReplayProvider().stopRecording(
+            DatadogSDKWrapperStorage.getSdkCore() as FeatureSdkCore
+        )
         promise.resolve(null)
     }
 

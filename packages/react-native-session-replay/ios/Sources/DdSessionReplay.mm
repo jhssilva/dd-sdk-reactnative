@@ -20,10 +20,26 @@ RCT_EXPORT_MODULE()
 RCT_REMAP_METHOD(enable, withEnableReplaySampleRate:(double)replaySampleRate
                  withDefaultPrivacyLevel:(NSString*)defaultPrivacyLevel
                  withCustomEndpoint:(NSString*)customEndpoint
+                 withStartRecordingImmediately:(BOOL)startRecordingImmediately
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 {
-    [self enable:replaySampleRate defaultPrivacyLevel:defaultPrivacyLevel customEndpoint:customEndpoint resolve:resolve reject:reject];
+    [self enable:replaySampleRate
+          defaultPrivacyLevel:defaultPrivacyLevel
+          customEndpoint:customEndpoint
+          startRecordingImmediately:startRecordingImmediately
+          resolve:resolve
+          reject:reject];
+}
+
+RCT_EXPORT_METHOD(startRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self startRecordingWithResolver:resolve reject:reject];
+}
+
+RCT_EXPORT_METHOD(stopRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self stopRecordingWithResolver:resolve reject:reject];
 }
 
 // Thanks to this guard, we won't compile this code when we build for the old architecture.
@@ -47,8 +63,26 @@ RCT_REMAP_METHOD(enable, withEnableReplaySampleRate:(double)replaySampleRate
     return NO;
 }
 
-- (void)enable:(double)replaySampleRate defaultPrivacyLevel:(NSString *)defaultPrivacyLevel customEndpoint:(NSString*)customEndpoint resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
-    [self.ddSessionReplayImplementation enableWithReplaySampleRate:replaySampleRate defaultPrivacyLevel:defaultPrivacyLevel customEndpoint:customEndpoint resolve:resolve reject:reject];
+- (void)enable:(double)replaySampleRate
+        defaultPrivacyLevel:(NSString *)defaultPrivacyLevel
+        customEndpoint:(NSString*)customEndpoint
+        startRecordingImmediately:(BOOL)startRecordingImmediately
+        resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject {
+    [self.ddSessionReplayImplementation enableWithReplaySampleRate:replaySampleRate
+                                               defaultPrivacyLevel:defaultPrivacyLevel
+                                                    customEndpoint:customEndpoint
+                                         startRecordingImmediately:startRecordingImmediately
+                                                           resolve:resolve
+                                                            reject:reject];
+}
+
+- (void)startRecordingWithResolver:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+    [self.ddSessionReplayImplementation startRecordingWithResolve:resolve reject:reject];
+}
+
+- (void)stopRecordingWithResolver:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+    [self.ddSessionReplayImplementation stopRecordingWithResolve:resolve reject:reject];
 }
 
 @end

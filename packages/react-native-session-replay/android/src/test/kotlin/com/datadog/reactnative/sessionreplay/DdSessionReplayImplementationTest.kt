@@ -16,6 +16,7 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.UIManagerModule
+import fr.xgouchet.elmyr.annotation.BoolForgery
 import fr.xgouchet.elmyr.annotation.DoubleForgery
 import fr.xgouchet.elmyr.annotation.StringForgery
 import fr.xgouchet.elmyr.junit5.ForgeExtension
@@ -72,31 +73,50 @@ internal class DdSessionReplayImplementationTest {
     @Test
     fun `M enable session replay W privacy = ALLOW`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        @StringForgery(regex = ".+") customEndpoint: String
+        @StringForgery(regex = ".+") customEndpoint: String,
+        @BoolForgery startRecordingImmediately: Boolean
     ) {
-        testSessionReplayEnable("ALLOW", replaySampleRate, customEndpoint)
+        testSessionReplayEnable(
+            "ALLOW",
+            replaySampleRate,
+            customEndpoint,
+            startRecordingImmediately
+        )
     }
 
     @Test
     fun `M enable session replay W privacy = MASK`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        @StringForgery(regex = ".+") customEndpoint: String
+        @StringForgery(regex = ".+") customEndpoint: String,
+        @BoolForgery startRecordingImmediately: Boolean
     ) {
-        testSessionReplayEnable("MASK", replaySampleRate, customEndpoint)
+        testSessionReplayEnable(
+            "MASK",
+            replaySampleRate,
+            customEndpoint,
+            startRecordingImmediately
+        )
     }
 
     @Test
     fun `M enable session replay W privacy = MASK_USER_INPUT`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        @StringForgery(regex = ".+") customEndpoint: String
+        @StringForgery(regex = ".+") customEndpoint: String,
+        @BoolForgery startRecordingImmediately: Boolean
     ) {
-        testSessionReplayEnable("MASK_USER_INPUT", replaySampleRate, customEndpoint)
+        testSessionReplayEnable(
+            "MASK_USER_INPUT",
+            replaySampleRate,
+            customEndpoint,
+            startRecordingImmediately
+        )
     }
 
     private fun testSessionReplayEnable(
         privacy: String,
         replaySampleRate: Double,
-        customEndpoint: String
+        customEndpoint: String,
+        startRecordingImmediately: Boolean
     ) {
         // Given
         val sessionReplayConfigCaptor = argumentCaptor<SessionReplayConfiguration>()
@@ -106,6 +126,7 @@ internal class DdSessionReplayImplementationTest {
             replaySampleRate,
             privacy,
             customEndpoint,
+            startRecordingImmediately,
             mockPromise
         )
 
@@ -144,19 +165,27 @@ internal class DdSessionReplayImplementationTest {
     fun `M enable session replay without custom endpoint W empty string()`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
         // Not ALLOW nor MASK_USER_INPUT
-        @StringForgery(regex = "^/(?!ALLOW|MASK_USER_INPUT)([a-z0-9]+)$/i") privacy: String
+        @StringForgery(regex = "^/(?!ALLOW|MASK_USER_INPUT)([a-z0-9]+)$/i") privacy: String,
+        @BoolForgery startRecordingImmediately: Boolean
     ) {
         // Given
         val sessionReplayConfigCaptor = argumentCaptor<SessionReplayConfiguration>()
 
         // When
-        testedSessionReplay.enable(replaySampleRate, privacy, "", mockPromise)
+        testedSessionReplay.enable(
+            replaySampleRate,
+            privacy,
+            "",
+            startRecordingImmediately,
+            mockPromise
+        )
 
         // Then
         verify(mockSessionReplay).enable(sessionReplayConfigCaptor.capture(), any())
         assertThat(sessionReplayConfigCaptor.firstValue)
             .hasFieldEqualTo("sampleRate", replaySampleRate.toFloat())
             .hasFieldEqualTo("privacy", SessionReplayPrivacy.MASK)
+            .hasFieldEqualTo("startRecordingImmediately", startRecordingImmediately)
             .doesNotHaveField("customEndpointUrl")
     }
 }

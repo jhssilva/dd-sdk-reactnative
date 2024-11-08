@@ -24,4 +24,18 @@ internal class SessionReplaySDKWrapper : SessionReplayWrapper {
             sdkCore,
         )
     }
+
+    /**
+     * Manually start recording the current session.
+     */
+    override fun startRecording(sdkCore: SdkCore) {
+        SessionReplay.startRecording(sdkCore)
+    }
+
+    /**
+     * Manually stop recording the current session.
+     */
+    override fun stopRecording(sdkCore: SdkCore) {
+        SessionReplay.stopRecording(sdkCore)
+    }
 }

@@ -20,7 +20,8 @@ describe('SessionReplay', () => {
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 0,
                 'MASK',
-                ''
+                '',
+                true
             );
         });
 
@@ -34,7 +35,8 @@ describe('SessionReplay', () => {
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 100,
                 'ALLOW',
-                'https://session-replay.example.com'
+                'https://session-replay.example.com',
+                true
             );
         });
 
@@ -47,7 +49,19 @@ describe('SessionReplay', () => {
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 0,
                 'MASK',
-                ''
+                '',
+                true
+            );
+        });
+
+        it('calls native session replay with start immediately = false', () => {
+            SessionReplay.enable({ startRecordingImmediately: false });
+
+            expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
+                0,
+                'MASK',
+                '',
+                false
             );
         });
     });
