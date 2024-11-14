@@ -120,7 +120,7 @@ android {
   }
 
   defaultConfig {
-    minSdkVersion 21
+    minSdkVersion 24
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     versionCode 1
     versionName "1.0"

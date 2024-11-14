@@ -8,9 +8,14 @@ import { WebView as RNWebView } from 'react-native-webview';
 import React, { forwardRef, useCallback } from 'react';
 
 import NativeDdLogs from './ext-specs/NativeDdLogs';
+import { NativeDdSdk } from './ext-specs/NativeDdSdk';
+import {
+    getWebViewEventBridgingJS,
+    wrapJsCodeInTryAndCatch
+} from './utils/webview-js-utils';
+import type { DatadogMessageFormat } from './utils/webview-js-utils';
+import { isNewArchitecture } from './utils/env-utils';
 import { NativeDdWebView } from './specs/NativeDdWebView';
-import type { DatadogMessageFormat } from './utils/format-utils';
-import { wrapJsCodeInTryAndCatch } from './utils/format-utils';
 
 type Props = WebViewProps & {
     /**
@@ -39,6 +44,11 @@ const WebViewComponent = (props: Props, ref: React.Ref<RNWebView<Props>>) => {
                     (props.logUserCodeErrors ?? false)
                 ) {
                     NativeDdLogs?.error(ddMessage.message, {});
+                } else if (
+                    ddMessage.type === 'NATIVE_EVENT' &&
+                    ddMessage.message != null
+                ) {
+                    NativeDdSdk?.consumeWebviewEvent(ddMessage.message);
                 }
             };
 
@@ -61,6 +71,19 @@ const WebViewComponent = (props: Props, ref: React.Ref<RNWebView<Props>>) => {
         [userDefinedOnMessage, props.logUserCodeErrors]
     );
 
+    const getInjectedJavascriptBeforeContentLoaded = (): string | undefined => {
+        if (isNewArchitecture()) {
+            return getWebViewEventBridgingJS(
+                props.allowedHosts,
+                props.injectedJavaScriptBeforeContentLoaded
+            );
+        } else {
+            return wrapJsCodeInTryAndCatch(
+                props.injectedJavaScriptBeforeContentLoaded
+            );
+        }
+    };
+
     return (
         <RNWebView
             {...props}
@@ -74,9 +97,7 @@ const WebViewComponent = (props: Props, ref: React.Ref<RNWebView<Props>>) => {
             injectedJavaScript={wrapJsCodeInTryAndCatch(
                 props.injectedJavaScript
             )}
-            injectedJavaScriptBeforeContentLoaded={wrapJsCodeInTryAndCatch(
-                props.injectedJavaScriptBeforeContentLoaded
-            )}
+            injectedJavaScriptBeforeContentLoaded={getInjectedJavascriptBeforeContentLoaded()}
             ref={ref}
         />
     );

@@ -4,11 +4,11 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
-import { wrapJsCodeInTryAndCatch } from '../utils/format-utils';
+import { wrapJsCodeInTryAndCatch } from '../utils/webview-js-utils';
 
 import { dedent } from './__utils__/string-utils';
 
-describe('Format Utils', () => {
+describe('WebView JS Utils', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });

@@ -19,27 +19,12 @@ import com.reactnativecommunity.webview.RNCWebViewClient
 import com.reactnativecommunity.webview.RNCWebViewManager
 import com.reactnativecommunity.webview.RNCWebViewWrapper
 
-
 /**
  * The entry point to use Datadog auto-instrumented WebView feature.
  */
 class DdSdkReactNativeWebViewManager(
     private val reactContext: ReactContext
 ) : RNCWebViewManager() {
-    // Custom WebView Client
-    private class DatadogWebViewClient : RNCWebViewClient()
-
-    // Custom WebView
-    @SuppressLint("SetJavaScriptEnabled")
-    private class DatadogWebView(
-        reactContext: ThemedReactContext
-    ) : RNCWebView(reactContext) {
-        init {
-            // JavaScript has to be enabled for auto-instrumentation.
-            this.settings.javaScriptEnabled = true
-        }
-    }
-
     // The name used to reference this custom View from React Native.
     companion object {
         const val VIEW_NAME = "DdReactNativeWebView"
@@ -68,7 +53,7 @@ class DdSdkReactNativeWebViewManager(
     // The Custom WebView exposed properties.
     @ReactProp(name = "allowedHosts")
     fun setAllowedHosts(view: RNCWebViewWrapper, allowedHosts: ReadableArray) {
-        // TODO: Log failures w Telemetry
+        // TODO: RUM-7218 (Log failures w Telemetry)
         val webView = view.webView as? RNCWebView ?: return
         val datadogCore = _datadogCore
         val hosts = toStringList(allowedHosts)
@@ -83,20 +68,20 @@ class DdSdkReactNativeWebViewManager(
         }
     }
 
-    // Overrides the default ViewInstance by binding the CustomWebView to it.
+    @SuppressLint("SetJavaScriptEnabled")
     override fun createViewInstance(context: ThemedReactContext): RNCWebViewWrapper {
-        return super.createViewInstance(context, DatadogWebView(context))
+        val webView = RNCWebView(context)
+        webView.settings.javaScriptEnabled = true
+        return super.createViewInstance(context, webView)
     }
 
-    // Attaches our custom WebView client to the WebView.
     override fun addEventEmitters(
         reactContext: ThemedReactContext,
         view: RNCWebViewWrapper
     ) {
-        view.webView.webViewClient = DatadogWebViewClient()
+        view.webView.webViewClient = RNCWebViewClient()
     }
 
-    // Utility function for converting the ReadableArray to a list of strings.
     private fun toStringList(props: ReadableArray): List<String> {
         return props.toArrayList().filterIsInstance<String>()
     }
