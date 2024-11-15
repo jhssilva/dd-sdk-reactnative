@@ -188,8 +188,10 @@ dependencies {
     // https://github.com/facebook/react-native/blob/e1a1e6aa8030bf11d691c3dcf7abd13b25175027/packages/react-native-gradle-plugin/src/main/kotlin/com/facebook/react/utils/DependencyUtils.kt
     implementation "com.facebook.react:react-android:$reactNativeVersion"
   }
+
+  implementation "com.datadoghq:dd-sdk-android-webview:2.14.0"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "com.datadoghq:dd-sdk-android-webview:2.11.0"
+
   implementation project(path: ':datadog_mobile-react-native')
   implementation project(path: ':react-native-webview')
 
