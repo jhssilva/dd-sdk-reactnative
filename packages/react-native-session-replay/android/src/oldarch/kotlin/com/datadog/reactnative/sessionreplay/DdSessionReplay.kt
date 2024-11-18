@@ -27,7 +27,7 @@ class DdSessionReplay(
      * @param replaySampleRate The sample rate applied for session replay.
      * @param defaultPrivacyLevel The privacy level used for replay.
      * @param customEndpoint Custom server url for sending replay data.
-     * @param startRecordingImmediately Whether the recording should start immediately.
+     * @param startRecordingImmediately Whether the recording should start immediately when the feature is enabled.
      */
     @ReactMethod
     fun enable(
