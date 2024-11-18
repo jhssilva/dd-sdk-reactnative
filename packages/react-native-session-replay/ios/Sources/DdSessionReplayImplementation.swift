@@ -33,9 +33,9 @@ public class DdSessionReplayImplementation: NSObject {
     public func enable(
         replaySampleRate: Double,
         customEndpoint: String,
-        imagePrivacyLevel: String,
-        touchPrivacyLevel: String,
-        textAndInputPrivacyLevel: String,
+        imagePrivacyLevel: NSString,
+        touchPrivacyLevel: NSString,
+        textAndInputPrivacyLevel: NSString,
         startRecordingImmediately: Bool,
         resolve:RCTPromiseResolveBlock,
         reject:RCTPromiseRejectBlock
@@ -46,9 +46,9 @@ public class DdSessionReplayImplementation: NSObject {
         }
         var sessionReplayConfiguration = SessionReplay.Configuration(
             replaySampleRate: Float(replaySampleRate),
+            textAndInputPrivacyLevel: convertTextAndInputPrivacy(textAndInputPrivacyLevel),
             imagePrivacyLevel: convertImagePrivacy(imagePrivacyLevel),
             touchPrivacyLevel: convertTouchPrivacy(touchPrivacyLevel),
-            textAndInputPrivacyLevel: convertTextAndInputPrivacy(textAndInputPrivacyLevel),
             startRecordingImmediately: startRecordingImmediately,
             customEndpoint: customEndpointURL
         )

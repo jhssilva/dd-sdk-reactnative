@@ -20,7 +20,6 @@ import fr.xgouchet.elmyr.annotation.BoolForgery
 import fr.xgouchet.elmyr.annotation.DoubleForgery
 import fr.xgouchet.elmyr.annotation.StringForgery
 import fr.xgouchet.elmyr.junit5.ForgeExtension
-import java.util.Locale
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,6 +56,23 @@ internal class DdSessionReplayImplementationTest {
     @Mock
     lateinit var mockUiManagerModule: UIManagerModule
 
+    private val imagePrivacyMap = mapOf(
+        "MASK_ALL" to ImagePrivacy.MASK_ALL,
+        "MASK_NON_BUNDLED_ONLY" to ImagePrivacy.MASK_LARGE_ONLY,
+        "MASK_NONE" to ImagePrivacy.MASK_NONE
+    )
+
+    private val touchPrivacyMap = mapOf(
+        "SHOW" to TouchPrivacy.SHOW,
+        "HIDE" to TouchPrivacy.HIDE
+    )
+
+    private val inputPrivacyMap = mapOf(
+        "MASK_ALL" to TextAndInputPrivacy.MASK_ALL,
+        "MASK_ALL_INPUTS" to TextAndInputPrivacy.MASK_ALL_INPUTS,
+        "MASK_SENSITIVE_INPUTS" to TextAndInputPrivacy.MASK_SENSITIVE_INPUTS
+    )
+
     @BeforeEach
     fun `set up`() {
         whenever(mockReactContext.getNativeModule(any<Class<NativeModule>>()))
@@ -71,51 +87,31 @@ internal class DdSessionReplayImplementationTest {
     }
 
     @Test
-    fun `M enable session replay W privacy = ALLOW`(
+    fun `M enable session replay W random privacy settings`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
         @StringForgery(regex = ".+") customEndpoint: String,
         @BoolForgery startRecordingImmediately: Boolean
     ) {
-        testSessionReplayEnable(
-            "ALLOW",
-            replaySampleRate,
-            customEndpoint,
-            startRecordingImmediately
-        )
-    }
+        val imagePrivacy = imagePrivacyMap.keys.random()
+        val touchPrivacy = touchPrivacyMap.keys.random()
+        val textAndInputPrivacy = inputPrivacyMap.keys.random()
 
-    @Test
-    fun `M enable session replay W privacy = MASK`(
-        @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        @StringForgery(regex = ".+") customEndpoint: String,
-        @BoolForgery startRecordingImmediately: Boolean
-    ) {
         testSessionReplayEnable(
-            "MASK",
-            replaySampleRate,
-            customEndpoint,
-            startRecordingImmediately
-        )
-    }
-
-    @Test
-    fun `M enable session replay W privacy = MASK_USER_INPUT`(
-        @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        @StringForgery(regex = ".+") customEndpoint: String,
-        @BoolForgery startRecordingImmediately: Boolean
-    ) {
-        testSessionReplayEnable(
-            "MASK_USER_INPUT",
-            replaySampleRate,
-            customEndpoint,
-            startRecordingImmediately
+            replaySampleRate = replaySampleRate,
+            customEndpoint = customEndpoint,
+            imagePrivacy = imagePrivacy,
+            touchPrivacy = touchPrivacy,
+            textAndInputPrivacy = textAndInputPrivacy,
+            startRecordingImmediately = startRecordingImmediately
         )
     }
 
     private fun testSessionReplayEnable(
-        privacy: String,
         replaySampleRate: Double,
         customEndpoint: String,
+        imagePrivacy: String,
+        touchPrivacy: String,
+        textAndInputPrivacy: String,
         startRecordingImmediately: Boolean
     ) {
         // Given
@@ -124,8 +120,8 @@ internal class DdSessionReplayImplementationTest {
         // When
         testedSessionReplay.enable(
             replaySampleRate,
-            privacy,
             customEndpoint,
+            SessionReplayPrivacySettings(imagePrivacy, touchPrivacy, textAndInputPrivacy),
             startRecordingImmediately,
             mockPromise
         )
@@ -135,47 +131,31 @@ internal class DdSessionReplayImplementationTest {
         assertThat(sessionReplayConfigCaptor.firstValue)
             .hasFieldEqualTo("sampleRate", replaySampleRate.toFloat())
             .hasFieldEqualTo("customEndpointUrl", customEndpoint)
-
-        when (privacy.lowercase(Locale.US)) {
-            "mask_user_input" -> {
-                assertThat(sessionReplayConfigCaptor.firstValue)
-                    .hasFieldEqualTo("textAndInputPrivacy", TextAndInputPrivacy.MASK_ALL_INPUTS)
-                    .hasFieldEqualTo("imagePrivacy", ImagePrivacy.MASK_NONE)
-                    .hasFieldEqualTo("touchPrivacy", TouchPrivacy.HIDE)
-            }
-            "allow" -> {
-                assertThat(sessionReplayConfigCaptor.firstValue)
-                    .hasFieldEqualTo(
-                        "textAndInputPrivacy",
-                        TextAndInputPrivacy.MASK_SENSITIVE_INPUTS
-                    )
-                    .hasFieldEqualTo("imagePrivacy", ImagePrivacy.MASK_NONE)
-                    .hasFieldEqualTo("touchPrivacy", TouchPrivacy.SHOW)
-            }
-            else -> {
-                assertThat(sessionReplayConfigCaptor.firstValue)
-                    .hasFieldEqualTo("textAndInputPrivacy", TextAndInputPrivacy.MASK_ALL)
-                    .hasFieldEqualTo("imagePrivacy", ImagePrivacy.MASK_ALL)
-                    .hasFieldEqualTo("touchPrivacy", TouchPrivacy.HIDE)
-            }
-        }
+            .hasFieldEqualTo("textAndInputPrivacy", inputPrivacyMap[textAndInputPrivacy])
+            .hasFieldEqualTo("imagePrivacy", imagePrivacyMap[imagePrivacy])
+            .hasFieldEqualTo("touchPrivacy", touchPrivacyMap[touchPrivacy])
     }
 
     @Test
     fun `M enable session replay without custom endpoint W empty string()`(
         @DoubleForgery(min = 0.0, max = 100.0) replaySampleRate: Double,
-        // Not ALLOW nor MASK_USER_INPUT
-        @StringForgery(regex = "^/(?!ALLOW|MASK_USER_INPUT)([a-z0-9]+)$/i") privacy: String,
         @BoolForgery startRecordingImmediately: Boolean
     ) {
         // Given
+        val imagePrivacy = imagePrivacyMap.keys.random()
+        val touchPrivacy = touchPrivacyMap.keys.random()
+        val textAndInputPrivacy = inputPrivacyMap.keys.random()
         val sessionReplayConfigCaptor = argumentCaptor<SessionReplayConfiguration>()
 
         // When
         testedSessionReplay.enable(
             replaySampleRate,
-            privacy,
             "",
+            SessionReplayPrivacySettings(
+                imagePrivacyLevel = imagePrivacy,
+                touchPrivacyLevel = touchPrivacy,
+                textAndInputPrivacyLevel = textAndInputPrivacy
+            ),
             startRecordingImmediately,
             mockPromise
         )

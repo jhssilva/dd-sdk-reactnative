@@ -42,9 +42,11 @@ class DdSessionReplay(
         implementation.enable(
             replaySampleRate,
             customEndpoint,
-            imagePrivacyLevel,
-            touchPrivacyLevel,
-            textAndInputPrivacyLevel,
+            SessionReplayPrivacySettings(
+                imagePrivacyLevel = imagePrivacyLevel,
+                touchPrivacyLevel = touchPrivacyLevel,
+                textAndInputPrivacyLevel = textAndInputPrivacyLevel
+            ),
             promise
         )
     }

@@ -6,7 +6,21 @@
 
 import { NativeModules } from 'react-native';
 
-import { SessionReplay, SessionReplayPrivacy } from '../SessionReplay';
+import {
+    ImagePrivacyLevel,
+    SessionReplay,
+    SessionReplayPrivacy,
+    TextAndInputPrivacyLevel,
+    TouchPrivacyLevel
+} from '../SessionReplay';
+
+function getRandomEnumValue<
+    T extends { [s: string]: T[keyof T] } | ArrayLike<T[keyof T]>
+>(enumObj: T): T[keyof T] {
+    const values = Object.values(enumObj) as T[keyof T][]; // Get all enum values
+    const randomIndex = Math.floor(Math.random() * values.length); // Generate a random index
+    return values[randomIndex]; // Return the random value
+}
 
 beforeEach(() => {
     NativeModules.DdSessionReplay.enable.mockClear();
@@ -19,13 +33,15 @@ describe('SessionReplay', () => {
 
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 0,
-                'MASK',
                 '',
+                'MASK_ALL',
+                'HIDE',
+                'MASK_ALL',
                 true
             );
         });
 
-        it('calls native session replay with provided configuration', () => {
+        it('calls native session replay with provided configuration { w defaultPrivacyLevel = ALLOW }', () => {
             SessionReplay.enable({
                 replaySampleRate: 100,
                 defaultPrivacyLevel: SessionReplayPrivacy.ALLOW,
@@ -34,10 +50,75 @@ describe('SessionReplay', () => {
 
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 100,
-                'ALLOW',
                 'https://session-replay.example.com',
+                'MASK_NONE',
+                'SHOW',
+                'MASK_SENSITIVE_INPUTS',
                 true
             );
+        });
+
+        it('calls native session replay with provided configuration { w defaultPrivacyLevel = MASK }', () => {
+            SessionReplay.enable({
+                replaySampleRate: 100,
+                defaultPrivacyLevel: SessionReplayPrivacy.MASK,
+                customEndpoint: 'https://session-replay.example.com'
+            });
+
+            expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
+                100,
+                'https://session-replay.example.com',
+                'MASK_ALL',
+                'HIDE',
+                'MASK_ALL',
+                true
+            );
+        });
+
+        it('calls native session replay with provided configuration { w defaultPrivacyLevel = MASK_USER_INPUT }', () => {
+            SessionReplay.enable({
+                replaySampleRate: 100,
+                defaultPrivacyLevel: SessionReplayPrivacy.MASK_USER_INPUT,
+                customEndpoint: 'https://session-replay.example.com'
+            });
+
+            expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
+                100,
+                'https://session-replay.example.com',
+                'MASK_NONE',
+                'HIDE',
+                'MASK_ALL_INPUTS',
+                true
+            );
+        });
+
+        it('calls native session replay with provided configuration { w random privacy levels }', () => {
+            const TIMES = 20;
+
+            const image = getRandomEnumValue(ImagePrivacyLevel);
+            const touch = getRandomEnumValue(TouchPrivacyLevel);
+            const textAndInput = getRandomEnumValue(TextAndInputPrivacyLevel);
+
+            for (let i = 0; i < TIMES; ++i) {
+                SessionReplay.enable({
+                    replaySampleRate: 100,
+                    customEndpoint: 'https://session-replay.example.com',
+                    imagePrivacyLevel: image,
+                    touchPrivacyLevel: touch,
+                    textAndInputPrivacyLevel: textAndInput
+                });
+
+                expect(
+                    NativeModules.DdSessionReplay.enable
+                ).toHaveBeenCalledWith(
+                    100,
+                    'https://session-replay.example.com',
+                    image,
+                    touch,
+                    textAndInput,
+                    true
+                );
+            }
         });
 
         it('calls native session replay with edge cases in configuration', () => {
@@ -48,20 +129,11 @@ describe('SessionReplay', () => {
 
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
                 0,
-                'MASK',
                 '',
+                'MASK_ALL',
+                'HIDE',
+                'MASK_ALL',
                 true
-            );
-        });
-
-        it('calls native session replay with start immediately = false', () => {
-            SessionReplay.enable({ startRecordingImmediately: false });
-
-            expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
-                0,
-                'MASK',
-                '',
-                false
             );
         });
     });
