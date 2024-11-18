@@ -17,14 +17,20 @@ export interface Spec extends TurboModule {
     /**
      * Enable session replay and start recording session.
      * @param replaySampleRate: The sample rate applied for session replay.
-     * @param defaultPrivacyLevel: The privacy level used for replay.
      * @param customEndpoint: Custom server url for sending replay data.
-     * @param startRecordingImmediately: Whether the recording should start automatically when the feature is enabled. When `true`, the recording starts automatically; when `false` it doesn't, and the recording will need to be started manually. Default: `true`.
+     * @param imagePrivacyLevel: Defines the way images should be masked.
+     * @param touchPrivacyLevel: Defines the way user touches should be masked.
+     * @param textAndInputPrivacyLevel: Defines the way text and input should be masked.
+     * @param startRecordingImmediately: Whether the recording should start automatically when the feature is enabled.
+     * When `true`, the recording starts automatically; when `false` it doesn't,
+     * and the recording will need to be started manually. Default: `true`.
      */
     enable(
         replaySampleRate: number,
-        defaultPrivacyLevel: string,
         customEndpoint: string,
+        imagePrivacyLevel: string,
+        touchPrivacyLevel: string,
+        textAndInputPrivacyLevel: string,
         startRecordingImmediately: boolean
     ): Promise<void>;
 

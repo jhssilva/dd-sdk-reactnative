@@ -18,15 +18,19 @@
 RCT_EXPORT_MODULE()
 
 RCT_REMAP_METHOD(enable, withEnableReplaySampleRate:(double)replaySampleRate
-                 withDefaultPrivacyLevel:(NSString*)defaultPrivacyLevel
                  withCustomEndpoint:(NSString*)customEndpoint
+                 withImagePrivacyLevel:(NSString*)imagePrivacyLevel
+                 withTouchPrivacyLevel:(NSString*)touchPrivacyLevel
+                 withTextAndInputPrivacyLevel:(NSString*)textAndInputPrivacyLevel
                  withStartRecordingImmediately:(BOOL)startRecordingImmediately
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 {
     [self enable:replaySampleRate
-          defaultPrivacyLevel:defaultPrivacyLevel
           customEndpoint:customEndpoint
+          imagePrivacyLevel:imagePrivacyLevel
+          touchPrivacyLevel:touchPrivacyLevel
+          textAndInputPrivacyLevel:textAndInputPrivacyLevel
           startRecordingImmediately:startRecordingImmediately
           resolve:resolve
           reject:reject];
@@ -64,14 +68,18 @@ RCT_EXPORT_METHOD(stopRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RC
 }
 
 - (void)enable:(double)replaySampleRate
-        defaultPrivacyLevel:(NSString *)defaultPrivacyLevel
         customEndpoint:(NSString*)customEndpoint
+        imagePrivacyLevel:(NSString *)imagePrivacyLevel
+        touchPrivacyLevel:(NSString *)touchPrivacyLevel
+        textAndInputPrivacyLevel:(NSString *)textAndInputPrivacyLevel
         startRecordingImmediately:(BOOL)startRecordingImmediately
         resolve:(RCTPromiseResolveBlock)resolve
         reject:(RCTPromiseRejectBlock)reject {
     [self.ddSessionReplayImplementation enableWithReplaySampleRate:replaySampleRate
-                                               defaultPrivacyLevel:defaultPrivacyLevel
                                                     customEndpoint:customEndpoint
+                                                 imagePrivacyLevel:imagePrivacyLevel
+                                                 touchPrivacyLevel:touchPrivacyLevel
+                                          textAndInputPrivacyLevel:textAndInputPrivacyLevel
                                          startRecordingImmediately:startRecordingImmediately
                                                            resolve:resolve
                                                             reject:reject];
