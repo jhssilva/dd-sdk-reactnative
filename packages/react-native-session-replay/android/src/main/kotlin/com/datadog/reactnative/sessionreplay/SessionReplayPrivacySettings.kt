@@ -6,6 +6,7 @@
 
 package com.datadog.reactnative.sessionreplay
 
+import android.util.Log
 import com.datadog.android.sessionreplay.ImagePrivacy
 import com.datadog.android.sessionreplay.TextAndInputPrivacy
 import com.datadog.android.sessionreplay.TouchPrivacy
@@ -45,7 +46,11 @@ class SessionReplayPrivacySettings(
                 "MASK_ALL" -> ImagePrivacy.MASK_ALL
                 "MASK_NONE" -> ImagePrivacy.MASK_NONE
                 else -> {
-                    // TODO: Log wrong usage / mapping.
+                    Log.w(
+                        SessionReplayPrivacySettings::class.java.canonicalName,
+                        "Unknown Session Replay Image Privacy Level given: $imagePrivacyLevel, " +
+                                "using ${ImagePrivacy.MASK_ALL} as default"
+                    )
                     ImagePrivacy.MASK_ALL
                 }
             }
@@ -56,7 +61,11 @@ class SessionReplayPrivacySettings(
                 "SHOW" -> TouchPrivacy.SHOW
                 "HIDE" -> TouchPrivacy.HIDE
                 else -> {
-                    // TODO: Log wrong usage / mapping.
+                    Log.w(
+                        SessionReplayPrivacySettings::class.java.canonicalName,
+                        "Unknown Session Replay Touch Privacy Level given: $touchPrivacyLevel, " +
+                                "using ${TouchPrivacy.HIDE} as default"
+                    )
                     TouchPrivacy.HIDE
                 }
             }
@@ -68,7 +77,11 @@ class SessionReplayPrivacySettings(
                 "MASK_ALL_INPUTS" -> TextAndInputPrivacy.MASK_ALL_INPUTS
                 "MASK_ALL" -> TextAndInputPrivacy.MASK_ALL
                 else -> {
-                    // TODO: Log wrong usage / mapping
+                    Log.w(
+                        SessionReplayPrivacySettings::class.java.canonicalName,
+                        "Unknown Session Replay Text And Input Privacy Level given: $textAndInputPrivacyLevel, " +
+                                "using ${TextAndInputPrivacy.MASK_ALL} as default"
+                    )
                     TextAndInputPrivacy.MASK_ALL
                 }
             }

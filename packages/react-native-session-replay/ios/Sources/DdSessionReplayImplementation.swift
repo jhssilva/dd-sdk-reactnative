@@ -98,7 +98,7 @@ public class DdSessionReplayImplementation: NSObject {
         case "MASK_NONE":
             return .maskNone
         default:
-            // TODO: Log wrong usage / mapping
+            consolePrint("Unknown Session Replay Image Privacy Level given: \(imagePrivacy), using .maskAll as default.", .warn)
             return .maskAll
         }
     }
@@ -110,7 +110,7 @@ public class DdSessionReplayImplementation: NSObject {
         case "HIDE":
             return .hide
         default:
-            // TODO: Log wrong usage / mapping
+            consolePrint("Unknown Session Replay Touch Privacy Level given: \(touchPrivacy), using .hide as default.", .warn)
             return .hide
         }
     }
@@ -124,7 +124,7 @@ public class DdSessionReplayImplementation: NSObject {
         case "MASK_ALL":
             return .maskAll
         default:
-            // TODO: Log wrong usage / mapping
+            consolePrint("Unknown Session Replay Text and Input Privacy Level given: \(textAndInputPrivacy), using .maskAll as default.", .warn)
             return .maskAll
         }
     }
