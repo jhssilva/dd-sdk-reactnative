@@ -25,60 +25,162 @@ internal class DdSessionReplayTests: XCTestCase {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
         DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 0, defaultPrivacyLevel: "MASK", customEndpoint: "", resolve: mockResolve, reject: mockReject)
+            .enable(replaySampleRate: 0, defaultPrivacyLevel: "MASK", customEndpoint: "", startRecordingImmediately: true, resolve: mockResolve, reject: mockReject)
 
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 0.0, privacyLevel: .mask, customEndpoint: nil))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 0.0,
+            privacyLevel: .mask,
+            customEndpoint: nil,
+            startRecordingImmediately: true
+        ))
     }
     
     func testEnablesSessionReplayWithMaskPrivacyLevel() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 100, defaultPrivacyLevel: "MASK", customEndpoint: "", resolve: mockResolve, reject: mockReject)
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "MASK",
+            customEndpoint: "",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
         
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 100.0, privacyLevel: .mask, customEndpoint: nil))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 100.0,
+            privacyLevel: .mask,
+            customEndpoint: nil,
+            startRecordingImmediately: true
+        ))
     }
     
     func testEnablesSessionReplayWithMaskUserInputPrivacyLevel() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 100, defaultPrivacyLevel: "MASK_USER_INPUT", customEndpoint: "", resolve: mockResolve, reject: mockReject)
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "MASK_USER_INPUT",
+            customEndpoint: "",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
         
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 100.0, privacyLevel: .maskUserInput, customEndpoint: nil))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 100.0,
+            privacyLevel: .maskUserInput,
+            customEndpoint: nil,
+            startRecordingImmediately: true
+        ))
     }
     
     func testEnablesSessionReplayWithAllowPrivacyLevel() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 100, defaultPrivacyLevel: "ALLOW", customEndpoint: "", resolve: mockResolve, reject: mockReject)
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "ALLOW",
+            customEndpoint: "",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
         
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 100.0, privacyLevel: .allow, customEndpoint: nil))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 100.0,
+            privacyLevel: .allow,
+            customEndpoint: nil,
+            startRecordingImmediately: true
+        ))
     }
     
     func testEnablesSessionReplayWithBadPrivacyLevel() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 100, defaultPrivacyLevel: "BAD_VALUE", customEndpoint: "", resolve: mockResolve, reject: mockReject)
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "BAD_VALUE",
+            customEndpoint: "",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
         
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 100.0, privacyLevel: .mask, customEndpoint: nil))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 100.0,
+            privacyLevel: .mask,
+            customEndpoint: nil,
+            startRecordingImmediately: true
+        ))
     }
     
     func testEnablesSessionReplayWithCustomEndpoint() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 100, defaultPrivacyLevel: "MASK", customEndpoint: "https://session-replay.example.com", resolve: mockResolve, reject: mockReject)
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "MASK",
+            customEndpoint: "https://session-replay.example.com",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject)
         
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(replaySampleRate: 100.0, privacyLevel: .mask, customEndpoint: URL(string: "https://session-replay.example.com/api/v2/replay")))
+        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
+            replaySampleRate: 100.0,
+            privacyLevel: .mask,
+            customEndpoint: URL(string: "https://session-replay.example.com/api/v2/replay"),
+            startRecordingImmediately: true
+        ))
+    }
+    
+    func testStartSessionReplayManually() {
+        let sessionReplayMock = MockSessionReplay()
+        let uiManagerMock = MockUIManager()
+        let sessionReplay = DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
+        sessionReplay.enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "MASK",
+            customEndpoint: "https://session-replay.example.com",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
+        
+        sessionReplay.startRecording(resolve: mockResolve, reject: mockReject)
+        
+        XCTAssertEqual(sessionReplayMock.calledMethods.last, .startRecording)
+    }
+    
+    func testStopSessionReplayManually() {
+        let sessionReplayMock = MockSessionReplay()
+        let uiManagerMock = MockUIManager()
+        let sessionReplay = DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
+        sessionReplay.enable(
+            replaySampleRate: 100,
+            defaultPrivacyLevel: "MASK",
+            customEndpoint: "https://session-replay.example.com",
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject
+        )
+        
+        sessionReplay.stopRecording(resolve: mockResolve, reject: mockReject)
+        
+        XCTAssertEqual(sessionReplayMock.calledMethods.last, .stopRecording)
     }
 }
 
 private class MockSessionReplay: SessionReplayProtocol {
     enum CalledMethod: Equatable {
-        case enable(replaySampleRate: Float, privacyLevel: SessionReplayPrivacyLevel, customEndpoint: URL?)
+        case enable(
+            replaySampleRate: Float,
+            privacyLevel: SessionReplayPrivacyLevel,
+            customEndpoint: URL?,
+            startRecordingImmediately: Bool
+        )
+        case startRecording
+        case stopRecording
     }
 
     public var calledMethods = [CalledMethod]()
@@ -88,9 +190,18 @@ private class MockSessionReplay: SessionReplayProtocol {
             .enable(
                 replaySampleRate: configuration.replaySampleRate,
                 privacyLevel: configuration.defaultPrivacyLevel,
-                customEndpoint: configuration.customEndpoint
+                customEndpoint: configuration.customEndpoint,
+                startRecordingImmediately: configuration.startRecordingImmediately
             )
         )
+    }
+    
+    func startRecording(in core: any DatadogInternal.DatadogCoreProtocol) {
+        calledMethods.append(.startRecording)
+    }
+    
+    func stopRecording(in core: any DatadogInternal.DatadogCoreProtocol) {
+        calledMethods.append(.stopRecording)
     }
 }
 
