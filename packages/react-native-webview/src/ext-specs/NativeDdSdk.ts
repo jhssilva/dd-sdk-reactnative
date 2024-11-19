@@ -15,6 +15,7 @@ export interface PartialNativeDdSdkSpec extends TurboModule {
     consumeWebviewEvent(message: string): Promise<void>;
     telemetryError(message: string, stack: string, kind: string): Promise<void>;
 }
+
 export const NativeDdSdk = TurboModuleRegistry.get<PartialNativeDdSdkSpec>(
     'DdSdk'
 );
