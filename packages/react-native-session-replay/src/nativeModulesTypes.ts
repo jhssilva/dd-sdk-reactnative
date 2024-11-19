@@ -11,7 +11,12 @@ import type { Spec as NativeDdSessionReplay } from './specs/NativeDdSessionRepla
  * As we cannot use enums or classes in the specs, we override methods using them here.
  */
 
-type PrivacyLevel = 'MASK' | 'MASK_USER_INPUT' | 'ALLOW';
+type ImagePrivacyLevel = 'MASK_NON_BUNDLED_ONLY' | 'MASK_ALL' | 'MASK_NONE';
+type TouchPrivacyLevel = 'SHOW' | 'HIDE';
+type TextAndInputPrivacyLevel =
+    | 'MASK_SENSITIVE_INPUTS'
+    | 'MASK_ALL_INPUTS'
+    | 'MASK_ALL';
 
 /**
  * The entry point to use Datadog's Session Replay feature.
@@ -20,14 +25,20 @@ export interface NativeSessionReplayType extends NativeDdSessionReplay {
     /**
      * Enable session replay and start recording session.
      * @param replaySampleRate: The sample rate applied for session replay.
-     * @param defaultPrivacyLevel: The privacy level used for replay.
      * @param customEndpoint: Custom server url for sending replay data.
-     * @param startRecordingImmediately: Whether the recording should start automatically when the feature is enabled. When `true`, the recording starts automatically; when `false` it doesn't, and the recording will need to be started manually. Default: `true`.
+     * @param imagePrivacyLevel: Defines the way images should be masked.
+     * @param touchPrivacyLevel: Defines the way user touches should be masked.
+     * @param textAndInputPrivacyLevel: Defines the way text and input should be masked.
+     * @param startRecordingImmediately: Whether the recording should start automatically when the feature is enabled.
+     * When `true`, the recording starts automatically; when `false` it doesn't, and the recording will need
+     * to be started manually. Default: `true`.
      */
     enable(
         replaySampleRate: number,
-        defaultPrivacyLevel: PrivacyLevel,
         customEndpoint: string,
+        imagePrivacyLevel: ImagePrivacyLevel,
+        touchPrivacyLevel: TouchPrivacyLevel,
+        textAndInputPrivacyLevel: TextAndInputPrivacyLevel,
         startRecordingImmediately: boolean
     ): Promise<void>;
 

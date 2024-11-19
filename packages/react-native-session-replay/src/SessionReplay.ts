@@ -12,6 +12,49 @@ export enum SessionReplayPrivacy {
     MASK_USER_INPUT = 'MASK_USER_INPUT'
 }
 
+export enum ImagePrivacyLevel {
+    /**
+     * Only images that are bundled within the application will be recorded.
+     *
+     * On Android, all images larger than 100x100 dp will be masked, as we consider them non-bundled images.
+     */
+    MASK_NON_BUNDLED_ONLY = 'MASK_NON_BUNDLED_ONLY',
+    /**
+     * No images will be recorded.
+     */
+    MASK_ALL = 'MASK_ALL',
+    /**
+     * All images will be recorded, including the ones downloaded from the Internet or generated during the app runtime.
+     */
+    MASK_NONE = 'MASK_NONE'
+}
+
+export enum TouchPrivacyLevel {
+    /**
+     * Show all user touches.
+     */
+    SHOW = 'SHOW',
+    /**
+     * Hide all user touches.
+     */
+    HIDE = 'HIDE'
+}
+
+export enum TextAndInputPrivacyLevel {
+    /**
+     * Show all texts except sensitive inputs (e.g password fields).
+     */
+    MASK_SENSITIVE_INPUTS = 'MASK_SENSITIVE_INPUTS',
+    /**
+     * Mask all input fields (e.g text fields, switches, checkboxes).
+     */
+    MASK_ALL_INPUTS = 'MASK_ALL_INPUTS',
+    /**
+     * Mask all texts and inputs (e.g labels).
+     */
+    MASK_ALL = 'MASK_ALL'
+}
+
 /**
  * The Session Replay configuration object.
  */
@@ -24,16 +67,27 @@ export interface SessionReplayConfiguration {
      * Default value is `20`.
      */
     replaySampleRate?: number;
+
     /**
-     * Defines the way sensitive content (e.g. text) should be masked.
-     *
-     * Default `SessionReplayPrivacy.MASK`.
+     * Defines the way images should be masked (Default: `MASK_ALL`)
      */
-    defaultPrivacyLevel?: SessionReplayPrivacy;
+    imagePrivacyLevel?: ImagePrivacyLevel;
+
+    /**
+     * Defines the way user touches (e.g tap) should be masked (Default: `HIDE`)
+     */
+    touchPrivacyLevel?: TouchPrivacyLevel;
+
+    /**
+     * Defines the way text and input (e.g text fields, checkboxes) should be masked (Default: `MASK_ALL`)
+     */
+    textAndInputPrivacyLevel?: TextAndInputPrivacyLevel;
+
     /**
      * Custom server url for sending replay data.
      */
     customEndpoint?: string;
+
     /**
      * Whether the recording should start automatically when the feature is enabled.
      * When `true`, the recording starts automatically.
@@ -41,12 +95,41 @@ export interface SessionReplayConfiguration {
      * Default: `true`.
      */
     startRecordingImmediately?: boolean;
+
+    /**
+     * Defines the way sensitive content (e.g. text) should be masked.
+     *
+     * Default `SessionReplayPrivacy.MASK`.
+     * @deprecated Use {@link imagePrivacyLevel}, {@link touchPrivacyLevel} and {@link textAndInputPrivacyLevel} instead.
+     * Note: setting this property (`defaultPrivacyLevel`) will override the individual privacy levels.
+     */
+    defaultPrivacyLevel?: SessionReplayPrivacy;
 }
 
-const DEFAULTS = {
+type InternalBaseSessionReplayConfiguration = {
+    replaySampleRate: number;
+    customEndpoint: string;
+    startRecordingImmediately: boolean;
+};
+
+type InternalPrivacySessionReplayConfiguration = {
+    imagePrivacyLevel: ImagePrivacyLevel;
+    touchPrivacyLevel: TouchPrivacyLevel;
+    textAndInputPrivacyLevel: TextAndInputPrivacyLevel;
+};
+
+type InternalSessionReplayConfiguration = InternalBaseSessionReplayConfiguration &
+    InternalPrivacySessionReplayConfiguration;
+
+const DEFAULTS: InternalSessionReplayConfiguration & {
+    defaultPrivacyLevel: SessionReplayPrivacy;
+} = {
     replaySampleRate: 0,
     defaultPrivacyLevel: SessionReplayPrivacy.MASK,
     customEndpoint: '',
+    imagePrivacyLevel: ImagePrivacyLevel.MASK_ALL,
+    touchPrivacyLevel: TouchPrivacyLevel.HIDE,
+    textAndInputPrivacyLevel: TextAndInputPrivacyLevel.MASK_ALL,
     startRecordingImmediately: true
 };
 
@@ -57,30 +140,21 @@ export class SessionReplayWrapper {
 
     private buildConfiguration = (
         configuration?: SessionReplayConfiguration
-    ): {
-        replaySampleRate: number;
-        defaultPrivacyLevel: SessionReplayPrivacy;
-        customEndpoint: string;
-        startRecordingImmediately: boolean;
-    } => {
+    ): InternalSessionReplayConfiguration => {
         if (!configuration) {
             return DEFAULTS;
         }
         const {
             replaySampleRate,
-            defaultPrivacyLevel,
             customEndpoint,
             startRecordingImmediately
         } = configuration;
-        return {
+
+        const baseConfig: InternalBaseSessionReplayConfiguration = {
             replaySampleRate:
                 replaySampleRate !== undefined
                     ? replaySampleRate
                     : DEFAULTS.replaySampleRate,
-            defaultPrivacyLevel:
-                defaultPrivacyLevel !== undefined
-                    ? defaultPrivacyLevel
-                    : DEFAULTS.defaultPrivacyLevel,
             customEndpoint:
                 customEndpoint !== undefined
                     ? customEndpoint
@@ -90,6 +164,45 @@ export class SessionReplayWrapper {
                     ? startRecordingImmediately
                     : DEFAULTS.startRecordingImmediately
         };
+
+        const privacyConfig: InternalPrivacySessionReplayConfiguration = {
+            imagePrivacyLevel:
+                configuration.imagePrivacyLevel ?? DEFAULTS.imagePrivacyLevel,
+            touchPrivacyLevel:
+                configuration.touchPrivacyLevel ?? DEFAULTS.touchPrivacyLevel,
+            textAndInputPrivacyLevel:
+                configuration.textAndInputPrivacyLevel ??
+                DEFAULTS.textAndInputPrivacyLevel
+        };
+
+        // Legacy Default Privacy Level property handling
+        if (configuration.defaultPrivacyLevel) {
+            switch (configuration.defaultPrivacyLevel) {
+                case SessionReplayPrivacy.MASK:
+                    privacyConfig.imagePrivacyLevel =
+                        ImagePrivacyLevel.MASK_ALL;
+                    privacyConfig.touchPrivacyLevel = TouchPrivacyLevel.HIDE;
+                    privacyConfig.textAndInputPrivacyLevel =
+                        TextAndInputPrivacyLevel.MASK_ALL;
+                    break;
+                case SessionReplayPrivacy.MASK_USER_INPUT:
+                    privacyConfig.imagePrivacyLevel =
+                        ImagePrivacyLevel.MASK_NONE;
+                    privacyConfig.touchPrivacyLevel = TouchPrivacyLevel.HIDE;
+                    privacyConfig.textAndInputPrivacyLevel =
+                        TextAndInputPrivacyLevel.MASK_ALL_INPUTS;
+                    break;
+                case SessionReplayPrivacy.ALLOW:
+                    privacyConfig.imagePrivacyLevel =
+                        ImagePrivacyLevel.MASK_NONE;
+                    privacyConfig.touchPrivacyLevel = TouchPrivacyLevel.SHOW;
+                    privacyConfig.textAndInputPrivacyLevel =
+                        TextAndInputPrivacyLevel.MASK_SENSITIVE_INPUTS;
+                    break;
+            }
+        }
+
+        return { ...baseConfig, ...privacyConfig };
     };
 
     /**
@@ -99,15 +212,19 @@ export class SessionReplayWrapper {
     enable = (configuration?: SessionReplayConfiguration): Promise<void> => {
         const {
             replaySampleRate,
-            defaultPrivacyLevel,
             customEndpoint,
+            imagePrivacyLevel,
+            touchPrivacyLevel,
+            textAndInputPrivacyLevel,
             startRecordingImmediately
         } = this.buildConfiguration(configuration);
 
         return this.nativeSessionReplay.enable(
             replaySampleRate,
-            defaultPrivacyLevel,
             customEndpoint,
+            imagePrivacyLevel,
+            touchPrivacyLevel,
+            textAndInputPrivacyLevel,
             startRecordingImmediately
         );
     };

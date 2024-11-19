@@ -12,6 +12,23 @@ import DatadogInternal
 import React
 
 internal class DdSessionReplayTests: XCTestCase {
+    private let imagePrivacyMap: [String: ImagePrivacyLevel] = [
+        "MASK_ALL": .maskAll,
+        "MASK_NON_BUNDLED_ONLY": .maskNonBundledOnly,
+        "MASK_NONE": .maskNone
+    ]
+
+    private let touchPrivacyMap: [String: TouchPrivacyLevel] = [
+        "SHOW": .show,
+        "HIDE": .hide
+    ]
+    
+    private let inputPrivacyMap: [String: TextAndInputPrivacyLevel] = [
+        "MASK_ALL": .maskAll,
+        "MASK_ALL_INPUTS": .maskAllInputs,
+        "MASK_SENSITIVE_INPUTS": .maskSensitiveInputs
+    ]
+    
     private func mockResolve(args: Any?) {}
     private func mockReject(args: String?, arg: String?, err: Error?) {}
     
@@ -24,93 +41,59 @@ internal class DdSessionReplayTests: XCTestCase {
     func testEnablesSessionReplayWithZeroReplaySampleRate() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-            .enable(replaySampleRate: 0, defaultPrivacyLevel: "MASK", customEndpoint: "", startRecordingImmediately: true, resolve: mockResolve, reject: mockReject)
+        
+        guard
+            let imagePrivacyLevel = imagePrivacyMap.keys.randomElement(),
+            let imagePrivacy = imagePrivacyMap[imagePrivacyLevel],
+            let touchPrivacyLevel = touchPrivacyMap.keys.randomElement(),
+            let touchPrivacy = touchPrivacyMap[touchPrivacyLevel],
+            let textAndInputPrivacyLevel = inputPrivacyMap.keys.randomElement(),
+            let textAndInputPrivacy = inputPrivacyMap[textAndInputPrivacyLevel]
+        else {
+            XCTFail("Cannot retrieve privacy levels from maps")
+            return
+        }
+        
+        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+            replaySampleRate: 0,
+            customEndpoint: "",
+            imagePrivacyLevel: NSString(string: imagePrivacyLevel),
+            touchPrivacyLevel: NSString(string: touchPrivacyLevel),
+            textAndInputPrivacyLevel: NSString(string: textAndInputPrivacyLevel),
+            startRecordingImmediately: true,
+            resolve: mockResolve,
+            reject: mockReject)
 
         XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
             replaySampleRate: 0.0,
-            privacyLevel: .mask,
             customEndpoint: nil,
+            imagePrivacyLevel: imagePrivacy,
+            touchPrivacyLevel: touchPrivacy,
+            textAndInputPrivacyLevel: textAndInputPrivacy,
             startRecordingImmediately: true
         ))
     }
     
-    func testEnablesSessionReplayWithMaskPrivacyLevel() {
+    func testEnablesSessionReplayWithBadPrivacyLevels() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
-            replaySampleRate: 100,
-            defaultPrivacyLevel: "MASK",
-            customEndpoint: "",
-            startRecordingImmediately: true,
-            resolve: mockResolve,
-            reject: mockReject
-        )
-        
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
-            replaySampleRate: 100.0,
-            privacyLevel: .mask,
-            customEndpoint: nil,
-            startRecordingImmediately: true
-        ))
-    }
     
-    func testEnablesSessionReplayWithMaskUserInputPrivacyLevel() {
-        let sessionReplayMock = MockSessionReplay()
-        let uiManagerMock = MockUIManager()
         DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
             replaySampleRate: 100,
-            defaultPrivacyLevel: "MASK_USER_INPUT",
             customEndpoint: "",
+            imagePrivacyLevel: "BAD_VALUE",
+            touchPrivacyLevel: "BAD_VALUE",
+            textAndInputPrivacyLevel: "BAD_VALUE",
             startRecordingImmediately: true,
             resolve: mockResolve,
-            reject: mockReject
-        )
+            reject: mockReject)
         
         XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
             replaySampleRate: 100.0,
-            privacyLevel: .maskUserInput,
             customEndpoint: nil,
-            startRecordingImmediately: true
-        ))
-    }
-    
-    func testEnablesSessionReplayWithAllowPrivacyLevel() {
-        let sessionReplayMock = MockSessionReplay()
-        let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
-            replaySampleRate: 100,
-            defaultPrivacyLevel: "ALLOW",
-            customEndpoint: "",
-            startRecordingImmediately: true,
-            resolve: mockResolve,
-            reject: mockReject
-        )
-        
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
-            replaySampleRate: 100.0,
-            privacyLevel: .allow,
-            customEndpoint: nil,
-            startRecordingImmediately: true
-        ))
-    }
-    
-    func testEnablesSessionReplayWithBadPrivacyLevel() {
-        let sessionReplayMock = MockSessionReplay()
-        let uiManagerMock = MockUIManager()
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
-            replaySampleRate: 100,
-            defaultPrivacyLevel: "BAD_VALUE",
-            customEndpoint: "",
-            startRecordingImmediately: true,
-            resolve: mockResolve,
-            reject: mockReject
-        )
-        
-        XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
-            replaySampleRate: 100.0,
-            privacyLevel: .mask,
-            customEndpoint: nil,
+            imagePrivacyLevel: .maskAll,
+            touchPrivacyLevel: .hide,
+            textAndInputPrivacyLevel: .maskAll,
             startRecordingImmediately: true
         ))
     }
@@ -118,56 +101,37 @@ internal class DdSessionReplayTests: XCTestCase {
     func testEnablesSessionReplayWithCustomEndpoint() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
+        
+        guard
+            let imagePrivacyLevel = imagePrivacyMap.keys.randomElement(),
+            let imagePrivacy = imagePrivacyMap[imagePrivacyLevel],
+            let touchPrivacyLevel = touchPrivacyMap.keys.randomElement(),
+            let touchPrivacy = touchPrivacyMap[touchPrivacyLevel],
+            let textAndInputPrivacyLevel = inputPrivacyMap.keys.randomElement(),
+            let textAndInputPrivacy = inputPrivacyMap[textAndInputPrivacyLevel]
+        else {
+            XCTFail("Cannot retrieve privacy levels from maps")
+            return
+        }
+        
         DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
             replaySampleRate: 100,
-            defaultPrivacyLevel: "MASK",
             customEndpoint: "https://session-replay.example.com",
+            imagePrivacyLevel: NSString(string: imagePrivacyLevel),
+            touchPrivacyLevel: NSString(string: touchPrivacyLevel),
+            textAndInputPrivacyLevel: NSString(string: textAndInputPrivacyLevel),
             startRecordingImmediately: true,
             resolve: mockResolve,
             reject: mockReject)
         
         XCTAssertEqual(sessionReplayMock.calledMethods.first, .enable(
             replaySampleRate: 100.0,
-            privacyLevel: .mask,
             customEndpoint: URL(string: "https://session-replay.example.com/api/v2/replay"),
+            imagePrivacyLevel: imagePrivacy,
+            touchPrivacyLevel: touchPrivacy,
+            textAndInputPrivacyLevel: textAndInputPrivacy,
             startRecordingImmediately: true
         ))
-    }
-    
-    func testStartSessionReplayManually() {
-        let sessionReplayMock = MockSessionReplay()
-        let uiManagerMock = MockUIManager()
-        let sessionReplay = DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-        sessionReplay.enable(
-            replaySampleRate: 100,
-            defaultPrivacyLevel: "MASK",
-            customEndpoint: "https://session-replay.example.com",
-            startRecordingImmediately: true,
-            resolve: mockResolve,
-            reject: mockReject
-        )
-        
-        sessionReplay.startRecording(resolve: mockResolve, reject: mockReject)
-        
-        XCTAssertEqual(sessionReplayMock.calledMethods.last, .startRecording)
-    }
-    
-    func testStopSessionReplayManually() {
-        let sessionReplayMock = MockSessionReplay()
-        let uiManagerMock = MockUIManager()
-        let sessionReplay = DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock)
-        sessionReplay.enable(
-            replaySampleRate: 100,
-            defaultPrivacyLevel: "MASK",
-            customEndpoint: "https://session-replay.example.com",
-            startRecordingImmediately: true,
-            resolve: mockResolve,
-            reject: mockReject
-        )
-        
-        sessionReplay.stopRecording(resolve: mockResolve, reject: mockReject)
-        
-        XCTAssertEqual(sessionReplayMock.calledMethods.last, .stopRecording)
     }
 }
 
@@ -175,8 +139,10 @@ private class MockSessionReplay: SessionReplayProtocol {
     enum CalledMethod: Equatable {
         case enable(
             replaySampleRate: Float,
-            privacyLevel: SessionReplayPrivacyLevel,
             customEndpoint: URL?,
+            imagePrivacyLevel: ImagePrivacyLevel,
+            touchPrivacyLevel: TouchPrivacyLevel,
+            textAndInputPrivacyLevel: TextAndInputPrivacyLevel,
             startRecordingImmediately: Bool
         )
         case startRecording
@@ -189,8 +155,10 @@ private class MockSessionReplay: SessionReplayProtocol {
         calledMethods.append(
             .enable(
                 replaySampleRate: configuration.replaySampleRate,
-                privacyLevel: configuration.defaultPrivacyLevel,
                 customEndpoint: configuration.customEndpoint,
+                imagePrivacyLevel: configuration.imagePrivacyLevel,
+                touchPrivacyLevel: configuration.touchPrivacyLevel,
+                textAndInputPrivacyLevel: configuration.textAndInputPrivacyLevel,
                 startRecordingImmediately: configuration.startRecordingImmediately
             )
         )

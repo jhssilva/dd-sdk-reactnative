@@ -28,22 +28,25 @@ class DdSessionReplayImplementation(
     /**
      * Enable session replay and start recording session.
      * @param replaySampleRate The sample rate applied for session replay.
-     * @param defaultPrivacyLevel The privacy level used for replay.
+     * @param customEndpoint Custom server url for sending replay data.
+     * @param privacySettings Defines the way visual elements should be masked.
      * @param customEndpoint Custom server url for sending replay data.
      * @param startRecordingImmediately Whether the recording should start immediately when the feature is enabled.
      */
     fun enable(
         replaySampleRate: Double,
-        defaultPrivacyLevel: String,
         customEndpoint: String,
+        privacySettings: SessionReplayPrivacySettings,
         startRecordingImmediately: Boolean,
         promise: Promise
     ) {
         val sdkCore = DatadogSDKWrapperStorage.getSdkCore() as FeatureSdkCore
         val logger = sdkCore.internalLogger
         val configuration = SessionReplayConfiguration.Builder(replaySampleRate.toFloat())
-            .configurePrivacy(defaultPrivacyLevel)
             .startRecordingImmediately(startRecordingImmediately)
+            .setImagePrivacy(privacySettings.imagePrivacyLevel)
+            .setTouchPrivacy(privacySettings.touchPrivacyLevel)
+            .setTextAndInputPrivacy(privacySettings.textAndInputPrivacyLevel)
             .addExtensionSupport(ReactNativeSessionReplayExtensionSupport(reactContext, logger))
 
         if (customEndpoint != "") {
@@ -72,32 +75,6 @@ class DdSessionReplayImplementation(
             DatadogSDKWrapperStorage.getSdkCore() as FeatureSdkCore
         )
         promise.resolve(null)
-    }
-
-    @Deprecated("Privacy should be set with separate properties mapped to " +
-            "`setImagePrivacy`, `setTouchPrivacy`, `setTextAndInputPrivacy`, but they are" +
-            " currently unavailable.")
-    private fun SessionReplayConfiguration.Builder.configurePrivacy(
-        defaultPrivacyLevel: String
-    ): SessionReplayConfiguration.Builder {
-        when (defaultPrivacyLevel.lowercase(Locale.US)) {
-            "mask" -> {
-                this.setTextAndInputPrivacy(TextAndInputPrivacy.MASK_ALL)
-                this.setImagePrivacy(ImagePrivacy.MASK_ALL)
-                this.setTouchPrivacy(TouchPrivacy.HIDE)
-            }
-            "mask_user_input" -> {
-                this.setTextAndInputPrivacy(TextAndInputPrivacy.MASK_ALL_INPUTS)
-                this.setImagePrivacy(ImagePrivacy.MASK_NONE)
-                this.setTouchPrivacy(TouchPrivacy.HIDE)
-            }
-            "allow" -> {
-                this.setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
-                this.setImagePrivacy(ImagePrivacy.MASK_NONE)
-                this.setTouchPrivacy(TouchPrivacy.SHOW)
-            }
-        }
-        return this
     }
 
     companion object {

@@ -32,8 +32,10 @@ public class DdSessionReplayImplementation: NSObject {
     @objc
     public func enable(
         replaySampleRate: Double,
-        defaultPrivacyLevel: String,
         customEndpoint: String,
+        imagePrivacyLevel: NSString,
+        touchPrivacyLevel: NSString,
+        textAndInputPrivacyLevel: NSString,
         startRecordingImmediately: Bool,
         resolve:RCTPromiseResolveBlock,
         reject:RCTPromiseRejectBlock
@@ -44,7 +46,9 @@ public class DdSessionReplayImplementation: NSObject {
         }
         var sessionReplayConfiguration = SessionReplay.Configuration(
             replaySampleRate: Float(replaySampleRate),
-            defaultPrivacyLevel: buildPrivacyLevel(privacyLevel: defaultPrivacyLevel as NSString),
+            textAndInputPrivacyLevel: convertTextAndInputPrivacy(textAndInputPrivacyLevel),
+            imagePrivacyLevel: convertImagePrivacy(imagePrivacyLevel),
+            touchPrivacyLevel: convertTouchPrivacy(touchPrivacyLevel),
             startRecordingImmediately: startRecordingImmediately,
             customEndpoint: customEndpointURL
         )
@@ -85,16 +89,43 @@ public class DdSessionReplayImplementation: NSObject {
         resolve(nil)
     }
     
-    func buildPrivacyLevel(privacyLevel: NSString) -> SessionReplayPrivacyLevel {
-        switch privacyLevel.lowercased {
-        case "mask":
-            return .mask
-        case "mask_user_input":
-            return .maskUserInput
-        case "allow":
-            return .allow
+    func convertImagePrivacy(_ imagePrivacy: NSString) -> ImagePrivacyLevel {
+        switch imagePrivacy {
+        case "MASK_NON_BUNDLED_ONLY":
+            return .maskNonBundledOnly
+        case "MASK_ALL":
+            return .maskAll
+        case "MASK_NONE":
+            return .maskNone
         default:
-            return .mask
+            consolePrint("Unknown Session Replay Image Privacy Level given: \(imagePrivacy), using .maskAll as default.", .warn)
+            return .maskAll
+        }
+    }
+    
+    func convertTouchPrivacy(_ touchPrivacy: NSString) -> TouchPrivacyLevel {
+        switch touchPrivacy {
+        case "SHOW":
+            return .show
+        case "HIDE":
+            return .hide
+        default:
+            consolePrint("Unknown Session Replay Touch Privacy Level given: \(touchPrivacy), using .hide as default.", .warn)
+            return .hide
+        }
+    }
+    
+    func convertTextAndInputPrivacy(_ textAndInputPrivacy: NSString) -> TextAndInputPrivacyLevel {
+        switch textAndInputPrivacy {
+        case "MASK_SENSITIVE_INPUTS":
+            return .maskSensitiveInputs
+        case "MASK_ALL_INPUTS":
+            return .maskAllInputs
+        case "MASK_ALL":
+            return .maskAll
+        default:
+            consolePrint("Unknown Session Replay Text and Input Privacy Level given: \(textAndInputPrivacy), using .maskAll as default.", .warn)
+            return .maskAll
         }
     }
 }
