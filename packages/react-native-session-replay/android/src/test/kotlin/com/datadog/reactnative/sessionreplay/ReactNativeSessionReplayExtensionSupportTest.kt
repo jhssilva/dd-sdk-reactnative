@@ -8,6 +8,7 @@ package com.datadog.reactnative.sessionreplay
 
 import com.datadog.android.api.InternalLogger
 import com.datadog.reactnative.sessionreplay.mappers.ReactEditTextMapper
+import com.datadog.reactnative.sessionreplay.mappers.ReactNativeImageViewMapper
 import com.datadog.reactnative.sessionreplay.mappers.ReactTextMapper
 import com.datadog.reactnative.sessionreplay.mappers.ReactViewGroupMapper
 import com.facebook.react.bridge.NativeModule
@@ -62,15 +63,18 @@ internal class ReactNativeSessionReplayExtensionSupportTest {
         val customViewMappers = testedExtensionSupport.getCustomViewMappers()
 
         // Then
-        assertThat(customViewMappers).hasSize(3)
+        assertThat(customViewMappers).hasSize(4)
 
         assertThat(customViewMappers[0].getUnsafeMapper())
-            .isInstanceOf(ReactViewGroupMapper::class.java)
+            .isInstanceOf(ReactNativeImageViewMapper::class.java)
 
         assertThat(customViewMappers[1].getUnsafeMapper())
-            .isInstanceOf(ReactTextMapper::class.java)
+            .isInstanceOf(ReactViewGroupMapper::class.java)
 
         assertThat(customViewMappers[2].getUnsafeMapper())
+            .isInstanceOf(ReactTextMapper::class.java)
+
+        assertThat(customViewMappers[3].getUnsafeMapper())
             .isInstanceOf(ReactEditTextMapper::class.java)
     }
 

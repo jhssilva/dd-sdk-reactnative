@@ -11,11 +11,14 @@ import com.datadog.android.api.InternalLogger
 import com.datadog.android.sessionreplay.ExtensionSupport
 import com.datadog.android.sessionreplay.MapperTypeWrapper
 import com.datadog.android.sessionreplay.recorder.OptionSelectorDetector
+import com.datadog.android.sessionreplay.utils.DrawableToColorMapper
 import com.datadog.reactnative.sessionreplay.mappers.ReactEditTextMapper
+import com.datadog.reactnative.sessionreplay.mappers.ReactNativeImageViewMapper
 import com.datadog.reactnative.sessionreplay.mappers.ReactTextMapper
 import com.datadog.reactnative.sessionreplay.mappers.ReactViewGroupMapper
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.UIManagerModule
+import com.facebook.react.views.image.ReactImageView
 import com.facebook.react.views.text.ReactTextView
 import com.facebook.react.views.textinput.ReactEditText
 import com.facebook.react.views.view.ReactViewGroup
@@ -24,19 +27,19 @@ internal class ReactNativeSessionReplayExtensionSupport(
     private val reactContext: ReactContext,
     private val logger: InternalLogger
 ) : ExtensionSupport {
+    override fun name(): String {
+        return ReactNativeSessionReplayExtensionSupport::class.java.simpleName
+    }
 
     override fun getCustomViewMappers(): List<MapperTypeWrapper<*>> {
         val uiManagerModule = getUiManagerModule()
 
         return listOf(
+            MapperTypeWrapper(ReactImageView::class.java, ReactNativeImageViewMapper()),
             MapperTypeWrapper(ReactViewGroup::class.java, ReactViewGroupMapper()),
             MapperTypeWrapper(ReactTextView::class.java, ReactTextMapper(reactContext, uiManagerModule)),
             MapperTypeWrapper(ReactEditText::class.java, ReactEditTextMapper(reactContext, uiManagerModule)),
         )
-    }
-
-    override fun getOptionSelectorDetectors(): List<OptionSelectorDetector> {
-        return listOf()
     }
 
     @VisibleForTesting
@@ -52,6 +55,14 @@ internal class ReactNativeSessionReplayExtensionSupport(
             )
             return null
         }
+    }
+
+    override fun getOptionSelectorDetectors(): List<OptionSelectorDetector> {
+        return listOf()
+    }
+
+    override fun getCustomDrawableMapper(): List<DrawableToColorMapper> {
+        return emptyList()
     }
 
     internal companion object {
