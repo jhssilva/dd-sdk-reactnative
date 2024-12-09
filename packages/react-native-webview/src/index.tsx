@@ -9,13 +9,13 @@ import React, { forwardRef, useCallback } from 'react';
 
 import NativeDdLogs from './ext-specs/NativeDdLogs';
 import { NativeDdSdk } from './ext-specs/NativeDdSdk';
+import { NativeDdWebView } from './specs/NativeDdWebView';
+import { isNewArchitecture } from './utils/env-utils';
 import {
     getWebViewEventBridgingJS,
     wrapJsCodeInTryAndCatch
 } from './utils/webview-js-utils';
 import type { DatadogMessageFormat } from './utils/webview-js-utils';
-import { isNewArchitecture } from './utils/env-utils';
-import { NativeDdWebView } from './specs/NativeDdWebView';
 
 type Props = WebViewProps & {
     /**
