@@ -25,99 +25,100 @@ module.exports = {
     DdSdkReactNative: {
         initialize: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         isInitialized: jest.fn().mockImplementation(() => true),
         setUser: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         addUserExtraInfo: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         setAttributes: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         setTrackingConsent: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         telemetryDebug: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         telemetryError: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         clearAllData: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve()))
+            .mockImplementation(() => new Promise((resolve) => resolve())),
     },
 
     DdLogs: {
         debug: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         info: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         warn: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         error: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve()))
+            .mockImplementation(() => new Promise((resolve) => resolve())),
     },
 
     DdTrace: {
         startSpan: jest
             .fn()
             .mockImplementation(
-                () => new Promise(resolve => resolve('fakeSpanId'))
+                () => new Promise((resolve) => resolve('fakeSpanId'))
             ),
         finishSpan: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve()))
+            .mockImplementation(() => new Promise((resolve) => resolve())),
     },
 
     DdRum: {
         startView: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         stopView: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         startAction: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         stopAction: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         addAction: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         startResource: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         stopResource: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
+        generateUUID: jest.fn().mockImplementation(() => 'fakeUUID'),
         addError: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         addTiming: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         addFeatureFlagEvaluation: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         stopSession: jest
             .fn()
-            .mockImplementation(() => new Promise(resolve => resolve())),
+            .mockImplementation(() => new Promise((resolve) => resolve())),
         getCurrentSessionId: jest
             .fn()
             .mockImplementation(
-                () => new Promise(resolve => resolve('test-session-id'))
+                () => new Promise((resolve) => resolve('test-session-id'))
             ),
         setTimeProvider: jest.fn().mockImplementation(() => {}),
-        timeProvider: jest.fn().mockReturnValue(undefined)
+        timeProvider: jest.fn().mockReturnValue(undefined),
     },
 
-    DatadogProvider: DatadogProviderMock
-};
+    DatadogProvider: DatadogProviderMock,
+}

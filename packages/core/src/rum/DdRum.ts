@@ -30,6 +30,8 @@ import type {
     ResourceKind
 } from './types';
 
+import { TracingIdType, TracingIdentifier } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
+
 const generateEmptyPromise = () => new Promise<void>(resolve => resolve());
 
 class DdRumWrapper implements DdRumType {
@@ -97,11 +99,11 @@ class DdRumWrapper implements DdRumType {
     stopAction = (
         ...args:
             | [
-                  type: RumActionType,
-                  name: string,
-                  context?: object,
-                  timestampMs?: number
-              ]
+                type: RumActionType,
+                name: string,
+                context?: object,
+                timestampMs?: number
+            ]
             | [context?: object, timestampMs?: number]
     ): Promise<void> => {
         InternalLog.log('Stopping current RUM Action', SdkVerbosity.DEBUG);
@@ -224,6 +226,16 @@ class DdRumWrapper implements DdRumType {
             )
         );
     };
+
+    generateUUID = (
+        type: TracingIdType
+    ): string => {
+        if (type === TracingIdType.trace) {
+            return TracingIdentifier.createTraceId().id.toString();
+        }
+
+        return TracingIdentifier.createSpanId().id.toString();
+    }
 
     addError = (
         message: string,
@@ -359,19 +371,19 @@ class DdRumWrapper implements DdRumType {
     private getStopActionNativeCallArgs = (
         args:
             | [
-                  type: RumActionType,
-                  name: string,
-                  context?: object,
-                  timestampMs?: number
-              ]
+                type: RumActionType,
+                name: string,
+                context?: object,
+                timestampMs?: number
+            ]
             | [context?: object, timestampMs?: number]
     ):
         | [
-              type: RumActionType,
-              name: string,
-              context: object,
-              timestampMs: number
-          ]
+            type: RumActionType,
+            name: string,
+            context: object,
+            timestampMs: number
+        ]
         | null => {
         if (isNewStopActionAPI(args)) {
             return [
@@ -412,11 +424,11 @@ class DdRumWrapper implements DdRumType {
 const isNewStopActionAPI = (
     args:
         | [
-              type: RumActionType,
-              name: string,
-              context?: object,
-              timestampMs?: number
-          ]
+            type: RumActionType,
+            name: string,
+            context?: object,
+            timestampMs?: number
+        ]
         | [context?: object, timestampMs?: number]
 ): args is [
     type: RumActionType,
@@ -430,11 +442,11 @@ const isNewStopActionAPI = (
 const isOldStopActionAPI = (
     args:
         | [
-              type: RumActionType,
-              name: string,
-              context?: object,
-              timestampMs?: number
-          ]
+            type: RumActionType,
+            name: string,
+            context?: object,
+            timestampMs?: number
+        ]
         | [context?: object, timestampMs?: number]
 ): args is [context?: object, timestampMs?: number] => {
     return typeof args[0] === 'object' || typeof args[0] === 'undefined';
