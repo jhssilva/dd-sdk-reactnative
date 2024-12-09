@@ -98,6 +98,7 @@ module.exports = {
         stopResource: jest
             .fn()
             .mockImplementation(() => new Promise(resolve => resolve())),
+        generateUUID: jest.fn().mockImplementation(() => 'fakeUUID'),
         addError: jest
             .fn()
             .mockImplementation(() => new Promise(resolve => resolve())),
