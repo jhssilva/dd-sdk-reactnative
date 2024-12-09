@@ -4,70 +4,144 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
-package com.datadog.reactnative.sessionreplay.mappers
+ package com.datadog.reactnative.sessionreplay.mappers
 
-import com.datadog.android.api.InternalLogger
-import com.datadog.android.sessionreplay.model.MobileSegment
-import com.datadog.android.sessionreplay.recorder.MappingContext
-import com.datadog.android.sessionreplay.recorder.mapper.EditTextMapper
-import com.datadog.android.sessionreplay.recorder.mapper.WireframeMapper
-import com.datadog.android.sessionreplay.utils.AsyncJobStatusCallback
-import com.datadog.android.sessionreplay.utils.DefaultColorStringFormatter
-import com.datadog.android.sessionreplay.utils.DefaultViewBoundsResolver
-import com.datadog.android.sessionreplay.utils.DefaultViewIdentifierResolver
-import com.datadog.android.sessionreplay.utils.DrawableToColorMapper
-import com.datadog.reactnative.sessionreplay.NoopTextPropertiesResolver
-import com.datadog.reactnative.sessionreplay.ReactTextPropertiesResolver
-import com.datadog.reactnative.sessionreplay.TextPropertiesResolver
-import com.datadog.reactnative.sessionreplay.utils.TextViewUtils
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.uimanager.UIManagerModule
-import com.facebook.react.views.textinput.ReactEditText
+ import ReactViewBackgroundDrawableUtils
+ import android.view.View
+ import com.datadog.android.api.InternalLogger
+ import com.datadog.android.sessionreplay.model.MobileSegment
+ import com.datadog.android.sessionreplay.recorder.MappingContext
+ import com.datadog.android.sessionreplay.recorder.mapper.BaseAsyncBackgroundWireframeMapper
+ import com.datadog.android.sessionreplay.recorder.mapper.EditTextMapper
+ import com.datadog.android.sessionreplay.utils.AsyncJobStatusCallback
+ import com.datadog.android.sessionreplay.utils.DefaultColorStringFormatter
+ import com.datadog.android.sessionreplay.utils.DefaultViewBoundsResolver
+ import com.datadog.android.sessionreplay.utils.DefaultViewIdentifierResolver
+ import com.datadog.android.sessionreplay.utils.DrawableToColorMapper
+ import com.datadog.android.sessionreplay.utils.GlobalBounds
+ import com.datadog.reactnative.sessionreplay.NoopTextPropertiesResolver
+ import com.datadog.reactnative.sessionreplay.ReactTextPropertiesResolver
+ import com.datadog.reactnative.sessionreplay.TextPropertiesResolver
+ import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
+ import com.datadog.reactnative.sessionreplay.utils.TextViewUtils
+ import com.facebook.react.bridge.ReactContext
+ import com.facebook.react.uimanager.UIManagerModule
+ import com.facebook.react.views.image.ReactImageView
+ import com.facebook.react.views.textinput.ReactEditText
 
 internal class ReactEditTextMapper(
-    private val reactTextPropertiesResolver: TextPropertiesResolver =
-        NoopTextPropertiesResolver(),
-    private val textViewUtils: TextViewUtils = TextViewUtils(),
-): WireframeMapper<ReactEditText> {
+     private val reactTextPropertiesResolver: TextPropertiesResolver =
+         NoopTextPropertiesResolver(),
+     private val textViewUtils: TextViewUtils = TextViewUtils(),
+ ): BaseAsyncBackgroundWireframeMapper<ReactEditText>(
+     viewIdentifierResolver = DefaultViewIdentifierResolver,
+     colorStringFormatter = DefaultColorStringFormatter,
+     viewBoundsResolver = DefaultViewBoundsResolver,
+     drawableToColorMapper = DrawableToColorMapper.getDefault(),
+ ) {
+     private val drawableUtils = ReactViewBackgroundDrawableUtils()
 
-    private val editTextMapper = EditTextMapper(
-        viewIdentifierResolver = DefaultViewIdentifierResolver,
-        colorStringFormatter = DefaultColorStringFormatter,
-        viewBoundsResolver = DefaultViewBoundsResolver,
-        drawableToColorMapper = DrawableToColorMapper.getDefault(),
-    )
+     private val editTextMapper = EditTextMapper(
+         viewIdentifierResolver = viewIdentifierResolver,
+         colorStringFormatter = colorStringFormatter,
+         viewBoundsResolver = viewBoundsResolver,
+         drawableToColorMapper = drawableToColorMapper,
+     )
+ 
+     internal constructor(
+         reactContext: ReactContext,
+         uiManagerModule: UIManagerModule?
+     ): this(
+         reactTextPropertiesResolver = if (uiManagerModule == null) {
+             NoopTextPropertiesResolver()
+         } else {
+             ReactTextPropertiesResolver(
+                 reactContext = reactContext,
+                 uiManagerModule = uiManagerModule
+             )
+         }
+     )
+ 
+     override fun map(
+         view: ReactEditText,
+         mappingContext: MappingContext,
+         asyncJobStatusCallback: AsyncJobStatusCallback,
+         internalLogger: InternalLogger
+     ): List<MobileSegment.Wireframe> {
+         val bgWireframes = mutableListOf<MobileSegment.Wireframe>().apply {
+             addAll(super.map(
+                 view,
+                 mappingContext,
+                 asyncJobStatusCallback,
+                 internalLogger
+             ))
+         }
+ 
+         bgWireframes += editTextMapper.map(
+             view = view,
+             mappingContext = mappingContext,
+             asyncJobStatusCallback = asyncJobStatusCallback,
+             internalLogger = internalLogger
+         ).filterNot { it is MobileSegment.Wireframe.ImageWireframe }
+ 
+         return textViewUtils.mapTextViewToWireframes(
+             wireframes = bgWireframes,
+             view = view,
+             mappingContext = mappingContext,
+             reactTextPropertiesResolver = reactTextPropertiesResolver
+         )
+     }
 
-    internal constructor(
-        reactContext: ReactContext,
-        uiManagerModule: UIManagerModule?
-    ): this(
-        reactTextPropertiesResolver = if (uiManagerModule == null) {
-            NoopTextPropertiesResolver()
-        } else {
-            ReactTextPropertiesResolver(
-                reactContext = reactContext,
-                uiManagerModule = uiManagerModule
-            )
-        }
-    )
-    override fun map(
-        view: ReactEditText,
-        mappingContext: MappingContext,
-        asyncJobStatusCallback: AsyncJobStatusCallback,
-        internalLogger: InternalLogger
-    ): List<MobileSegment.Wireframe> {
-        val wireframes = editTextMapper.map(
-            view = view,
-            mappingContext = mappingContext,
-            asyncJobStatusCallback = asyncJobStatusCallback,
-            internalLogger = internalLogger
-        )
+    @Suppress("FunctionMaxLength")
+     override fun resolveBackgroundAsImageWireframe(
+         view: View,
+         bounds: GlobalBounds,
+         width: Int,
+         height: Int,
+         mappingContext: MappingContext,
+         asyncJobStatusCallback: AsyncJobStatusCallback
+     ): MobileSegment.Wireframe? {
+         if (view !is ReactImageView) {
+             return super.resolveBackgroundAsImageWireframe(
+                 view,
+                 bounds,
+                 width,
+                 height,
+                 mappingContext,
+                 asyncJobStatusCallback
+             )
+         }
 
-        return textViewUtils.mapTextViewToWireframes(
-            wireframes = wireframes,
-            view = view,
-            mappingContext = mappingContext,
-            reactTextPropertiesResolver = reactTextPropertiesResolver
-        )
-    }
-}
+         val bgDrawable = drawableUtils.getReactBackgroundFromDrawable(view.background)
+             ?: return null
+
+         val density = mappingContext.systemInformation.screenDensity
+
+         val identifier = viewIdentifierResolver.resolveChildUniqueIdentifier(
+             view,
+             "drawable0"
+         ) ?: return null
+
+         val globalBounds = viewBoundsResolver.resolveViewGlobalBounds(
+             view,
+             density
+         )
+
+         val (shape, border) = drawableUtils.resolveShapeAndBorder(
+             bgDrawable,
+             view.alpha,
+             mappingContext.systemInformation.screenDensity
+         )
+
+         return MobileSegment.Wireframe.ShapeWireframe(
+             identifier,
+             globalBounds.x,
+             globalBounds.y,
+             globalBounds.width,
+             globalBounds.height,
+             border = border,
+             shapeStyle = shape
+         )
+     }
+ }
+ 
