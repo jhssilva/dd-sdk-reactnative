@@ -2564,6 +2564,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@datadog/libdatadog@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@datadog/libdatadog@npm:0.2.2"
+  checksum: 4649b7353887aaf4614df328f81bdec96d338f8af998c2e29400d6df35ee89c97555805382c2f42698a2e66ab1c4a0312af6ab2f381d351b75addd3e08e018dd
+  languageName: node
+  linkType: hard
+
 "@datadog/mobile-react-native-apollo-client@workspace:packages/react-native-apollo-client":
   version: 0.0.0-use.local
   resolution: "@datadog/mobile-react-native-apollo-client@workspace:packages/react-native-apollo-client"
@@ -2673,50 +2680,50 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@datadog/native-appsec@npm:8.0.1":
-  version: 8.0.1
-  resolution: "@datadog/native-appsec@npm:8.0.1"
+"@datadog/native-appsec@npm:8.3.0":
+  version: 8.3.0
+  resolution: "@datadog/native-appsec@npm:8.3.0"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^3.9.0
-  checksum: 68b4085c9de46959ed7c5a2808ce7b54c3ca3d9acf46c235b9b1803ecf63e09b2393a56754c671149c929aa3729b3ea26a913fc5d4162af5ca83cd5dd7ab1fe7
+  checksum: 3ae46741f7a2390c6658a956f8dfdd624834a26b3b134b23ca5e0dac872e138bb900b53325c87340039907000060defdff2f9e722eda4442d7e714185264eab4
   languageName: node
   linkType: hard
 
-"@datadog/native-iast-rewriter@npm:2.3.1":
-  version: 2.3.1
-  resolution: "@datadog/native-iast-rewriter@npm:2.3.1"
+"@datadog/native-iast-rewriter@npm:2.5.0":
+  version: 2.5.0
+  resolution: "@datadog/native-iast-rewriter@npm:2.5.0"
   dependencies:
     lru-cache: ^7.14.0
     node-gyp-build: ^4.5.0
-  checksum: 00927ed3737bbecd59e0d4bf4b5a93f786c81c217504c269531e830abccd6b221dc35fe5e9bba27189471bae2a0f916d160aa3b70e592a8bab3a65e06da181df
+  checksum: 4ba41498a7f579d78fdc6390bc5880da070ec8667ddd2e6d7e9b3799421635b14d2d41e2a928e8e8f6a5487bda40a249498a37468541d24d7be40f5ba3e2ee92
   languageName: node
   linkType: hard
 
-"@datadog/native-iast-taint-tracking@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@datadog/native-iast-taint-tracking@npm:3.0.0"
+"@datadog/native-iast-taint-tracking@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@datadog/native-iast-taint-tracking@npm:3.2.0"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^3.9.0
-  checksum: 0034e267f8ab42a6fe7665823c4a564d2baf07608be01365179bc4021e242ffd0c477b407b911b1448cfdb4ba95998f50709eee3a1ae583164a443aea0f83482
+  checksum: 3d92769a62dff4c9abb71aa21fad136fd952045edcce581c72a2988eeda7f3d14d2a598b7ea90ca9b2354a49d86cf2253a45c4fda76e1951b33b44e715ca6594
   languageName: node
   linkType: hard
 
-"@datadog/native-metrics@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@datadog/native-metrics@npm:2.0.0"
+"@datadog/native-metrics@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@datadog/native-metrics@npm:3.0.1"
   dependencies:
     node-addon-api: ^6.1.0
     node-gyp: latest
     node-gyp-build: ^3.9.0
-  checksum: 3975904bebb6a073158d8e3fbee35208d3d98c9c03c8ed5e9dac02e31bfdc165b1d87452ac2e888bbbf0674a66567486493353cc1a9b4ec67e24347b323b530e
+  checksum: fbae931042d5c54514be8e658bb4ba812f233664036efee8c347374edb0252bc37c63a8a4eca161788fb6fafb1e3ebe82dfe36912052a1cdb896cabd2f7b7565
   languageName: node
   linkType: hard
 
-"@datadog/pprof@npm:5.3.0":
-  version: 5.3.0
-  resolution: "@datadog/pprof@npm:5.3.0"
+"@datadog/pprof@npm:5.4.1":
+  version: 5.4.1
+  resolution: "@datadog/pprof@npm:5.4.1"
   dependencies:
     delay: ^5.0.0
     node-gyp: latest
@@ -2724,7 +2731,7 @@ __metadata:
     p-limit: ^3.1.0
     pprof-format: ^2.1.0
     source-map: ^0.7.4
-  checksum: 74cd11b3a9018e99b3290a4e1a8be281307acd0e79c176d3a90ed2ac51468ce4450cef4bf878ed1d3bea56bafc19d421d8bddf64a0c78357e15bdb22dde71fb0
+  checksum: 9b419e6268a80603159022736cf468b230a980eb5d7763d7e10aeb3da0b49f2153efac8fac771d44e7be87c7243e024ec00c330b41c64d2c4c92c54e38cb1ee5
   languageName: node
   linkType: hard
 
@@ -8515,7 +8522,7 @@ __metadata:
     "@types/react-test-renderer": 18.0.0
     "@typescript-eslint/eslint-plugin": 5.61.0
     "@typescript-eslint/parser": 5.61.0
-    dd-trace: ^5.18.0
+    dd-trace: ^5.28.0
     eslint: ^8.19.0
     eslint-config-prettier: 6.0.0
     eslint-plugin-arca: 0.15.0
@@ -8539,22 +8546,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"dd-trace@npm:^5.18.0":
-  version: 5.18.0
-  resolution: "dd-trace@npm:5.18.0"
+"dd-trace@npm:^5.28.0":
+  version: 5.28.0
+  resolution: "dd-trace@npm:5.28.0"
   dependencies:
-    "@datadog/native-appsec": 8.0.1
-    "@datadog/native-iast-rewriter": 2.3.1
-    "@datadog/native-iast-taint-tracking": 3.0.0
-    "@datadog/native-metrics": ^2.0.0
-    "@datadog/pprof": 5.3.0
+    "@datadog/libdatadog": ^0.2.2
+    "@datadog/native-appsec": 8.3.0
+    "@datadog/native-iast-rewriter": 2.5.0
+    "@datadog/native-iast-taint-tracking": 3.2.0
+    "@datadog/native-metrics": ^3.0.1
+    "@datadog/pprof": 5.4.1
     "@datadog/sketches-js": ^2.1.0
+    "@isaacs/ttlcache": ^1.4.1
     "@opentelemetry/api": ">=1.0.0 <1.9.0"
     "@opentelemetry/core": ^1.14.0
     crypto-randomuuid: ^1.0.0
     dc-polyfill: ^0.1.4
     ignore: ^5.2.4
-    import-in-the-middle: ^1.8.1
+    import-in-the-middle: 1.11.2
     int64-buffer: ^0.1.9
     istanbul-lib-coverage: 3.2.0
     jest-docblock: ^29.7.0
@@ -8565,14 +8574,15 @@ __metadata:
     module-details-from-path: ^1.0.3
     msgpack-lite: ^0.1.26
     opentracing: ">=0.12.1"
-    path-to-regexp: ^0.1.2
+    path-to-regexp: ^0.1.10
     pprof-format: ^2.1.0
     protobufjs: ^7.2.5
     retry: ^0.13.1
+    rfdc: ^1.3.1
     semver: ^7.5.4
     shell-quote: ^1.8.1
     tlhunter-sorted-set: ^0.1.0
-  checksum: a28cb1ba8d1fd317b92298928df1de6b78462f41d0acb6f3d215ac0c13e72e850705cebc856d18108807a405aee5421795e81d268b387f8e40e54c6eac7cb694
+  checksum: a5d188768170fe33c13fff421b314ccd2e8105b2ce9839b2b2294d9478c75da994a5ad9d25015718778b0ccc61d966546a512b9ff50708e97ecf47363a64101c
   languageName: node
   linkType: hard
 
@@ -11238,15 +11248,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"import-in-the-middle@npm:^1.8.1":
-  version: 1.9.1
-  resolution: "import-in-the-middle@npm:1.9.1"
+"import-in-the-middle@npm:1.11.2":
+  version: 1.11.2
+  resolution: "import-in-the-middle@npm:1.11.2"
   dependencies:
     acorn: ^8.8.2
     acorn-import-attributes: ^1.9.5
     cjs-module-lexer: ^1.2.2
     module-details-from-path: ^1.0.3
-  checksum: 5f2778091aea3e4b450594c1520e3e6ad3298dbbb1613e8a0e856b67c595097ec9ad0944190619a0792ea5836fd6bd6ddce5a18a6b2dc7ae07127668b62ac693
+  checksum: 06fb73100a918e00778779713119236cc8d3d4656aae9076a18159cfcd28eb0cc26e0a5040d11da309c5f8f8915c143b8d74e73c0734d3f5549b1813d1008bb9
   languageName: node
   linkType: hard
 
@@ -14942,10 +14952,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-to-regexp@npm:^0.1.2":
-  version: 0.1.8
-  resolution: "path-to-regexp@npm:0.1.8"
-  checksum: b2f0fc08dcaff162e03866c5673d1ea950fa9852aedda224dc1acc25e44c73a75a43b1a6566941af0b6145b743c6f654fcbb62ffcd4013918d65a72b13f6a15c
+"path-to-regexp@npm:^0.1.10":
+  version: 0.1.12
+  resolution: "path-to-regexp@npm:0.1.12"
+  checksum: ab237858bee7b25ecd885189f175ab5b5161e7b712b360d44f5c4516b8d271da3e4bf7bf0a7b9153ecb04c7d90ce8ff5158614e1208819cf62bac2b08452722e
   languageName: node
   linkType: hard
 
@@ -16248,6 +16258,13 @@ __metadata:
   version: 1.0.4
   resolution: "reusify@npm:1.0.4"
   checksum: c3076ebcc22a6bc252cb0b9c77561795256c22b757f40c0d8110b1300723f15ec0fc8685e8d4ea6d7666f36c79ccc793b1939c748bf36f18f542744a4e379fcc
+  languageName: node
+  linkType: hard
+
+"rfdc@npm:^1.3.1":
+  version: 1.4.1
+  resolution: "rfdc@npm:1.4.1"
+  checksum: 3b05bd55062c1d78aaabfcea43840cdf7e12099968f368e9a4c3936beb744adb41cbdb315eac6d4d8c6623005d6f87fdf16d8a10e1ff3722e84afea7281c8d13
   languageName: node
   linkType: hard
 
