@@ -5,8 +5,20 @@
  */
 
 import type { SessionReplayConfiguration } from './SessionReplay';
-import { SessionReplay, SessionReplayPrivacy } from './SessionReplay';
+import {
+    SessionReplay,
+    SessionReplayPrivacy,
+    ImagePrivacyLevel,
+    TouchPrivacyLevel,
+    TextAndInputPrivacyLevel
+} from './SessionReplay';
 
-export { SessionReplay, SessionReplayPrivacy };
+export {
+    SessionReplay,
+    SessionReplayPrivacy,
+    ImagePrivacyLevel,
+    TouchPrivacyLevel,
+    TextAndInputPrivacyLevel
+};
 
 export type { SessionReplayConfiguration };

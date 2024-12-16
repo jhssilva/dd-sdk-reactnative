@@ -71,7 +71,7 @@ const generateTracingAttributesWithSampling = (
     const isSampled = hash <= threshold;
 
     const tracingAttributes: DdRumResourceTracingAttributes = {
-        traceId: traceId,
+        traceId,
         spanId: TracingIdentifier.createSpanId(),
         samplingPriorityHeader: isSampled ? '1' : '0',
         tracingStrategy: 'KEEP',
