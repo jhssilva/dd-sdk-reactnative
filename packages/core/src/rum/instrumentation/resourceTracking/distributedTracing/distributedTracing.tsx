@@ -12,6 +12,9 @@ import type { SpanId, TraceId } from './TracingIdentifier';
 import type { Hostname } from './firstPartyHosts';
 import { getPropagatorsForHost } from './firstPartyHosts';
 
+const knuthFactor = BigInt('1111111111111111111');
+const twoPow64 = BigInt('0x10000000000000000'); // 2n ** 64n
+
 export type DdRumResourceTracingAttributes =
     | {
           tracingStrategy: 'KEEP';
@@ -62,9 +65,13 @@ const generateTracingAttributesWithSampling = (
     tracingSamplingRate: number,
     propagatorTypes: PropagatorType[]
 ): DdRumResourceTracingAttributes => {
-    const isSampled = Math.random() * 100 <= tracingSamplingRate;
+    const traceId = TracingIdentifier.createTraceId();
+    const hash = Number((traceId.id * knuthFactor) % twoPow64);
+    const threshold = (tracingSamplingRate / 100) * Number(twoPow64);
+    const isSampled = hash <= threshold;
+
     const tracingAttributes: DdRumResourceTracingAttributes = {
-        traceId: TracingIdentifier.createTraceId(),
+        traceId: traceId,
         spanId: TracingIdentifier.createSpanId(),
         samplingPriorityHeader: isSampled ? '1' : '0',
         tracingStrategy: 'KEEP',
