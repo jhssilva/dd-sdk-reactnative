@@ -16,6 +16,7 @@ import { DdRum } from '../DdRum';
 import type { ActionEventMapper } from '../eventMappers/actionEventMapper';
 import type { ErrorEventMapper } from '../eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from '../eventMappers/resourceEventMapper';
+import { TracingIdType } from '../instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
 import { ErrorSource, PropagatorType, RumActionType } from '../types';
 
 jest.mock('../../utils/time-provider/DefaultTimeProvider', () => {
@@ -445,6 +446,21 @@ describe('DdRum', () => {
                     { context },
                     expect.anything()
                 );
+            });
+        });
+
+        describe('DdRum.generateUUID', () => {
+            it('generates a valid trace id in decimal format', () => {
+                const traceUUID = DdRum.generateUUID(TracingIdType.trace);
+
+                expect(traceUUID).toBeDefined(); // Ensure the value is defined
+                expect(BigInt(traceUUID)).toBeGreaterThan(0n); // Ensure it's a valid positive number
+            });
+            it('generates a valid span id in decimal format', () => {
+                const spanUUID = DdRum.generateUUID(TracingIdType.span);
+
+                expect(spanUUID).toBeDefined();
+                expect(BigInt(spanUUID)).toBeGreaterThan(0n);
             });
         });
 

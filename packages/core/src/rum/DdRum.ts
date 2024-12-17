@@ -23,6 +23,10 @@ import type { ErrorEventMapper } from './eventMappers/errorEventMapper';
 import { generateErrorEventMapper } from './eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from './eventMappers/resourceEventMapper';
 import { generateResourceEventMapper } from './eventMappers/resourceEventMapper';
+import {
+    TracingIdType,
+    TracingIdentifier
+} from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
 import type {
     ErrorSource,
     DdRumType,
@@ -223,6 +227,14 @@ class DdRumWrapper implements DdRumType {
                 mappedEvent.timestampMs
             )
         );
+    };
+
+    generateUUID = (type: TracingIdType): string => {
+        if (type === TracingIdType.trace) {
+            return TracingIdentifier.createTraceId().id.toString();
+        }
+
+        return TracingIdentifier.createSpanId().id.toString();
     };
 
     addError = (

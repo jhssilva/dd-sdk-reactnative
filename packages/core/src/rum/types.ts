@@ -4,6 +4,8 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import type { TracingIdType } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
+
 /**
  * The entry point to use Datadog's RUM feature.
  */
@@ -120,6 +122,12 @@ export type DdRumType = {
         context?: object,
         timestampMs?: number
     ): Promise<void>;
+
+    /**
+     * Generate a new unique tracing ID.
+     * @param type - The type of the tracing ID to generate. Trace (128-bit) or Span (64-bit).
+     */
+    generateUUID(type: TracingIdType): string;
 
     /**
      * Add a RUM Error.
