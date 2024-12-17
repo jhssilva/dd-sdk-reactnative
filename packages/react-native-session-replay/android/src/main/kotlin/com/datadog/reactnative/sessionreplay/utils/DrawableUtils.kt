@@ -7,29 +7,16 @@
 package com.datadog.reactnative.sessionreplay.utils
 
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.InsetDrawable
-import android.graphics.drawable.LayerDrawable
-import com.facebook.react.views.view.ReactViewBackgroundDrawable
+import com.datadog.android.sessionreplay.model.MobileSegment
 
-internal class DrawableUtils {
-    internal fun getReactBackgroundFromDrawable(drawable: Drawable?): ReactViewBackgroundDrawable? {
-        if (drawable is ReactViewBackgroundDrawable) {
-            return drawable
-        }
+internal abstract class DrawableUtils(
+    protected val reflectionUtils: ReflectionUtils = ReflectionUtils()
+) {
+    internal abstract fun resolveShapeAndBorder(
+        drawable: Drawable,
+        opacity: Float,
+        pixelDensity: Float
+    ): Pair<MobileSegment.ShapeStyle?, MobileSegment.ShapeBorder?>
 
-        if (drawable is InsetDrawable) {
-            return getReactBackgroundFromDrawable(drawable.drawable)
-        }
-
-        if (drawable is LayerDrawable) {
-            for (layerNumber in 0 until drawable.numberOfLayers) {
-                val layer = drawable.getDrawable(layerNumber)
-                if (layer is ReactViewBackgroundDrawable) {
-                    return layer
-                }
-            }
-        }
-
-        return null
-    }
+    internal abstract fun getReactBackgroundFromDrawable(drawable: Drawable?): Drawable?
 }

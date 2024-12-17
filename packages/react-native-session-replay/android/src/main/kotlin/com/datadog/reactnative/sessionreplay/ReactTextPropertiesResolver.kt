@@ -6,28 +6,26 @@
 
 package com.datadog.reactnative.sessionreplay
 
+import ReactViewBackgroundDrawableUtils
 import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import com.datadog.android.sessionreplay.model.MobileSegment
 import com.datadog.reactnative.sessionreplay.extensions.convertToDensityNormalized
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
-import com.datadog.reactnative.sessionreplay.utils.ReactViewBackgroundDrawableUtils
 import com.datadog.reactnative.sessionreplay.utils.ReflectionUtils
 import com.datadog.reactnative.sessionreplay.utils.formatAsRgba
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.views.text.TextAttributes
-import com.facebook.react.views.view.ReactViewBackgroundDrawable
 import java.util.Locale
 
 internal class ReactTextPropertiesResolver(
     private val reactContext: ReactContext,
     private val uiManagerModule: UIManagerModule,
     private val reflectionUtils: ReflectionUtils = ReflectionUtils(),
-    private val reactViewBackgroundDrawableUtils: ReactViewBackgroundDrawableUtils =
-        ReactViewBackgroundDrawableUtils(),
-    private val drawableUtils: DrawableUtils = DrawableUtils()
+    private val drawableUtils: DrawableUtils =
+        ReactViewBackgroundDrawableUtils()
 ): TextPropertiesResolver {
     override fun addReactNativeProperties(
         originalWireframe: MobileSegment.Wireframe.TextWireframe,
@@ -94,14 +92,14 @@ internal class ReactTextPropertiesResolver(
         view: TextView,
         pixelDensity: Float,
     ): Pair<MobileSegment.ShapeStyle?, MobileSegment.ShapeBorder?>? {
-        val backgroundDrawable: ReactViewBackgroundDrawable =
-            drawableUtils.getReactBackgroundFromDrawable(view.background) ?: return null
+        val backgroundDrawable = drawableUtils
+            .getReactBackgroundFromDrawable(view.background) ?: return null
 
         // view.alpha is the value of the opacity prop on the js side
         val opacity = view.alpha
 
         val (shapeStyle, border) =
-            reactViewBackgroundDrawableUtils
+            drawableUtils
                 .resolveShapeAndBorder(backgroundDrawable, opacity, pixelDensity)
 
         return shapeStyle to border

@@ -6,6 +6,7 @@
 
 package com.datadog.reactnative.sessionreplay.mappers
 
+import ReactViewBackgroundDrawableUtils
 import com.datadog.android.api.InternalLogger
 import com.datadog.android.sessionreplay.model.MobileSegment
 import com.datadog.android.sessionreplay.recorder.MappingContext
@@ -18,13 +19,11 @@ import com.datadog.android.sessionreplay.utils.DefaultViewBoundsResolver.resolve
 import com.datadog.android.sessionreplay.utils.DefaultViewIdentifierResolver
 import com.datadog.android.sessionreplay.utils.DrawableToColorMapper
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
-import com.datadog.reactnative.sessionreplay.utils.ReactViewBackgroundDrawableUtils
 import com.facebook.react.views.view.ReactViewGroup
 
 internal class ReactViewGroupMapper(
-    private val reactViewBackgroundDrawableUtils: ReactViewBackgroundDrawableUtils =
-        ReactViewBackgroundDrawableUtils(),
-    private val drawableUtils: DrawableUtils = DrawableUtils()
+    private val drawableUtils: DrawableUtils =
+        ReactViewBackgroundDrawableUtils()
 ) :
     BaseWireframeMapper<ReactViewGroup>(
         viewIdentifierResolver = DefaultViewIdentifierResolver,
@@ -49,7 +48,7 @@ internal class ReactViewGroupMapper(
 
         val (shapeStyle, border) =
             if (backgroundDrawable != null) {
-                reactViewBackgroundDrawableUtils
+                drawableUtils
                     .resolveShapeAndBorder(backgroundDrawable, opacity, pixelDensity)
             } else {
                 null to null

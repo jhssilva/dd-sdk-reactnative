@@ -6,6 +6,7 @@
 
 package com.datadog.reactnative.sessionreplay.utils
 
+import ReactViewBackgroundDrawableUtils
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
@@ -47,7 +48,7 @@ internal class DrawableUtilsTest {
         whenever(mockLayerDrawable.numberOfLayers).thenReturn(3)
         whenever(mockLayerDrawable.getDrawable(0)).thenReturn(mockReactViewBackgroundDrawable)
 
-        testedDrawableUtils = DrawableUtils()
+        testedDrawableUtils = ReactViewBackgroundDrawableUtils()
     }
 
     @Test

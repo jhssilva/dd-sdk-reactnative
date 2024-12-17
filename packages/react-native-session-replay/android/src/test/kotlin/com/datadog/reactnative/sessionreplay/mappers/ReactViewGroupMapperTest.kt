@@ -15,7 +15,6 @@ import com.datadog.android.sessionreplay.recorder.MappingContext
 import com.datadog.android.sessionreplay.recorder.SystemInformation
 import com.datadog.android.sessionreplay.utils.AsyncJobStatusCallback
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
-import com.datadog.reactnative.sessionreplay.utils.ReactViewBackgroundDrawableUtils
 import com.facebook.react.views.view.ReactViewBackgroundDrawable
 import com.facebook.react.views.view.ReactViewGroup
 import fr.xgouchet.elmyr.junit5.ForgeExtension
@@ -40,7 +39,7 @@ internal class ReactViewGroupMapperTest {
     private lateinit var testedMapper: ReactViewGroupMapper
 
     @Mock
-    private lateinit var mockReactViewBackgroundDrawableUtils: ReactViewBackgroundDrawableUtils
+    private lateinit var mockDrawableUtils: DrawableUtils
 
     @Mock
     private lateinit var mockReactViewGroup: ReactViewGroup
@@ -58,9 +57,6 @@ internal class ReactViewGroupMapperTest {
     private lateinit var mockSystemInformation: SystemInformation
 
     @Mock
-    private lateinit var mockDrawableUtils: DrawableUtils
-
-    @Mock
     private lateinit var mockReactViewBackgroundDrawable: ReactViewBackgroundDrawable
 
     @Mock
@@ -75,7 +71,6 @@ internal class ReactViewGroupMapperTest {
         whenever(mockSystemInformation.screenDensity).thenReturn(0f)
 
         testedMapper = ReactViewGroupMapper(
-            reactViewBackgroundDrawableUtils = mockReactViewBackgroundDrawableUtils,
             drawableUtils = mockDrawableUtils
         )
     }
@@ -115,7 +110,7 @@ internal class ReactViewGroupMapperTest {
             )
         ).thenReturn(mockReactViewBackgroundDrawable)
         whenever(
-            mockReactViewBackgroundDrawableUtils.resolveShapeAndBorder(
+            mockDrawableUtils.resolveShapeAndBorder(
                 drawable = eq(mockReactViewBackgroundDrawable),
                 pixelDensity = eq(0f),
                 opacity = eq(0f)

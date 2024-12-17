@@ -15,7 +15,6 @@ import com.datadog.reactnative.sessionreplay.ReactTextPropertiesResolver.Compani
 import com.datadog.reactnative.sessionreplay.ReactTextPropertiesResolver.Companion.TEXT_ATTRIBUTES_FIELD_NAME
 import com.datadog.reactnative.sessionreplay.ShadowNodeWrapper.Companion.UI_IMPLEMENTATION_FIELD_NAME
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
-import com.datadog.reactnative.sessionreplay.utils.ReactViewBackgroundDrawableUtils
 import com.datadog.reactnative.sessionreplay.utils.ReflectionUtils
 import com.datadog.reactnative.sessionreplay.utils.formatAsRgba
 import com.datadog.reactnative.tools.unit.forge.ForgeConfigurator
@@ -65,13 +64,10 @@ internal class ReactTextPropertiesResolverTest {
     lateinit var mockTextView: TextView
 
     @Mock
-    lateinit var mockDrawableUtils: DrawableUtils
-
-    @Mock
     lateinit var mockReactViewBackgroundDrawable: ReactViewBackgroundDrawable
 
     @Mock
-    lateinit var mockReactViewBackgroundDrawableUtils: ReactViewBackgroundDrawableUtils
+    lateinit var mockDrawableUtils: DrawableUtils
 
     @Mock
     lateinit var mockShadowNodeWrapper: ShadowNodeWrapper
@@ -108,7 +104,6 @@ internal class ReactTextPropertiesResolverTest {
         testedResolver = ReactTextPropertiesResolver(
             reactContext = mockReactContext,
             uiManagerModule = mockUiManagerModule,
-            reactViewBackgroundDrawableUtils = mockReactViewBackgroundDrawableUtils,
             drawableUtils = mockDrawableUtils,
             reflectionUtils = mockReflectionUtils
         )
@@ -145,7 +140,7 @@ internal class ReactTextPropertiesResolverTest {
             )
         ).thenReturn(mockReactViewBackgroundDrawable)
         whenever(
-            mockReactViewBackgroundDrawableUtils.resolveShapeAndBorder(
+            mockDrawableUtils.resolveShapeAndBorder(
                 drawable = eq(mockReactViewBackgroundDrawable),
                 opacity = eq(0f),
                 pixelDensity = eq(0f)
