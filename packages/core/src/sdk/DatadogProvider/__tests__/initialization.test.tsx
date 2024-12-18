@@ -91,6 +91,7 @@ describe('DatadogProvider', () => {
                   "nativeLongTaskThresholdMs": 200,
                   "nativeViewTracking": false,
                   "proxyConfig": undefined,
+                  "resourceTracingSamplingRate": 20,
                   "sampleRate": 100,
                   "serviceName": undefined,
                   "site": "US1",
