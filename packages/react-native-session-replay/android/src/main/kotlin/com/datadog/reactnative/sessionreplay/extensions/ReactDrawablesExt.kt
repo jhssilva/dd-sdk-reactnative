@@ -8,13 +8,14 @@ package com.datadog.reactnative.sessionreplay.extensions
 
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Bitmap.Config
+import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.VectorDrawable
 import android.widget.ImageView
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
-import androidx.core.graphics.drawable.toBitmapOrNull
 import com.facebook.drawee.drawable.ArrayDrawable
 import com.facebook.drawee.drawable.ForwardingDrawable
 import com.facebook.drawee.drawable.RoundedBitmapDrawable
@@ -151,4 +152,43 @@ internal fun Drawable.tryToExtractBitmap(
         }
         else -> return null
     }
+}
+
+internal fun Drawable.toBitmapOrNull(
+    width: Int = intrinsicWidth,
+    height: Int = intrinsicHeight,
+    config: Config? = null
+): Bitmap? {
+    if (this is BitmapDrawable && bitmap == null) {
+        return null
+    }
+    return toBitmap(width, height, config)
+}
+
+internal fun Drawable.toBitmap(
+    width: Int = intrinsicWidth,
+    height: Int = intrinsicHeight,
+    config: Config? = null
+): Bitmap {
+    if (this is BitmapDrawable) {
+        if (bitmap == null) {
+            // This is slightly better than returning an empty, zero-size bitmap.
+            throw IllegalArgumentException("bitmap is null")
+        }
+        if (config == null || bitmap.config == config) {
+            // Fast-path to return original. Bitmap.createScaledBitmap will do this check, but it
+            // involves allocation and two jumps into native code so we perform the check ourselves.
+            if (width == bitmap.width && height == bitmap.height) {
+                return bitmap
+            }
+            return Bitmap.createScaledBitmap(bitmap, width, height, true)
+        }
+    }
+
+    val bitmap = Bitmap.createBitmap(width, height, config ?: Config.ARGB_8888)
+    setBounds(0, 0, width, height)
+    draw(Canvas(bitmap))
+
+    setBounds(bounds.left, bounds.top, bounds.right, bounds.bottom)
+    return bitmap
 }
