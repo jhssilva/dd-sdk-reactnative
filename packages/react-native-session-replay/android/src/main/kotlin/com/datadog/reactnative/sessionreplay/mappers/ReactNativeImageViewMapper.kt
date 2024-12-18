@@ -89,10 +89,9 @@ internal class ReactNativeImageViewMapper: BaseAsyncBackgroundWireframeMapper<Re
     }
 
     private fun generateUUID(reactImageView: ReactImageView): String {
-        val source = reactImageView.imageSource?.source ?:
-        System.identityHashCode(reactImageView).toString()
+        val hashCode = System.identityHashCode(reactImageView).toString()
         val drawableType = reactImageView.drawable.current::class.java.name
-        return "${drawableType}-${source}"
+        return "${drawableType}-${hashCode}"
     }
 
     private fun Rect.toWireframeClip(): MobileSegment.WireframeClip {
