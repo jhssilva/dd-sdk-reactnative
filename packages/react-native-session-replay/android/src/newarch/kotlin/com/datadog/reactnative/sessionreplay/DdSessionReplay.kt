@@ -6,7 +6,6 @@
 
 package com.datadog.reactnative.sessionreplay
 
-import com.facebook.fbreact.specs.NativeDdSessionReplaySpec
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod

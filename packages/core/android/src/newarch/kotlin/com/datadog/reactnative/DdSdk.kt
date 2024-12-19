@@ -7,7 +7,6 @@
 package com.datadog.reactnative
 
 import android.app.Activity
-import com.facebook.fbreact.specs.NativeDdSdkSpec
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext

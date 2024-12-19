@@ -23,7 +23,7 @@ import com.facebook.drawee.drawable.ScaleTypeDrawable
 import com.facebook.drawee.drawable.ScalingUtils
 
 internal fun ScaleTypeDrawable.imageViewScaleType(): ImageView.ScaleType? {
-    return when (this.scaleType) {
+    return when (scaleType) {
         ScalingUtils.ScaleType.CENTER -> ImageView.ScaleType.CENTER
         ScalingUtils.ScaleType.CENTER_CROP -> ImageView.ScaleType.CENTER_CROP
         ScalingUtils.ScaleType.CENTER_INSIDE -> ImageView.ScaleType.CENTER_INSIDE
@@ -36,12 +36,9 @@ internal fun ScaleTypeDrawable.imageViewScaleType(): ImageView.ScaleType? {
 }
 
 internal fun ArrayDrawable.getScaleTypeDrawable(): ScaleTypeDrawable? {
-    for (i in 0 until this.numberOfLayers) {
-        try {
-            (this.getDrawable(i) as? ScaleTypeDrawable)?.let {
-                return it
-            }
-        } catch(_: IllegalArgumentException) { }
+    for (i in 0 until numberOfLayers) {
+        val drawable = getDrawableOrNull(i)
+        if (drawable is ScaleTypeDrawable) return drawable
     }
 
     return null
@@ -49,21 +46,21 @@ internal fun ArrayDrawable.getScaleTypeDrawable(): ScaleTypeDrawable? {
 
 internal fun ArrayDrawable.getDrawableOrNull(index: Int): Drawable? {
     return try {
-        this.getDrawable(index)
+        getDrawable(index)
     } catch (_: IllegalArgumentException) {
         null
     }
 }
 
 internal fun ForwardingDrawable.tryToExtractBitmap(resources: Resources): Bitmap? {
-    val forwardedDrawable = this.drawable
+    val forwardedDrawable = drawable
     return if (forwardedDrawable != null) {
         forwardedDrawable.tryToExtractBitmap(resources)
     } else {
-        this.toBitmapOrNull(
-            this.intrinsicWidth,
-            this.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
+       toBitmapOrNull(
+            intrinsicWidth,
+            intrinsicHeight,
+            Config.ARGB_8888
         )
     }
 }
@@ -81,24 +78,24 @@ internal fun RoundedBitmapDrawable.tryToExtractBitmap(): Bitmap? {
         null
     }
 
-    return privateBitmap ?: this.toBitmapOrNull(
-        this.intrinsicWidth,
-        this.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
+    return privateBitmap ?: toBitmapOrNull(
+        intrinsicWidth,
+        intrinsicHeight,
+        Config.ARGB_8888
     )
 }
 
 internal fun BitmapDrawable.tryToExtractBitmap(resources: Resources): Bitmap? {
-    if (this.bitmap != null) {
-        return this.bitmap
+    if (bitmap != null) {
+        return bitmap
     }
 
-    if (this.constantState != null) {
-        val copy = this.constantState?.newDrawable(resources)
+    if (constantState != null) {
+        val copy = constantState?.newDrawable(resources)
         return (copy as? BitmapDrawable)?.bitmap ?: copy?.toBitmapOrNull(
-            this.intrinsicWidth,
-            this.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
+            intrinsicWidth,
+            intrinsicHeight,
+            Config.ARGB_8888
         )
     }
 
@@ -108,8 +105,8 @@ internal fun BitmapDrawable.tryToExtractBitmap(resources: Resources): Bitmap? {
 internal fun ArrayDrawable.tryToExtractBitmap(resources: Resources): Bitmap? {
     var width = 0
     var height = 0
-    for (index in 0 until this.numberOfLayers) {
-        val drawable = this.getDrawableOrNull(index) ?: continue
+    for (index in 0 until numberOfLayers) {
+        val drawable = getDrawableOrNull(index) ?: continue
 
         if (drawable is ScaleTypeDrawable) {
             return drawable.tryToExtractBitmap(resources)
@@ -122,7 +119,7 @@ internal fun ArrayDrawable.tryToExtractBitmap(resources: Resources): Bitmap? {
     }
 
     return if (width > 0 && height > 0)
-        this.toBitmapOrNull(width, height, Bitmap.Config.ARGB_8888)
+        toBitmapOrNull(width, height, Config.ARGB_8888)
     else
         null
 }
@@ -132,22 +129,22 @@ internal fun Drawable.tryToExtractBitmap(
 ): Bitmap? {
     when (this) {
         is ArrayDrawable -> {
-            return this.tryToExtractBitmap(resources)
+            return tryToExtractBitmap(resources)
         }
         is ForwardingDrawable -> {
-            return this.tryToExtractBitmap(resources)
+            return tryToExtractBitmap(resources)
         }
         is RoundedBitmapDrawable -> {
-            return this.tryToExtractBitmap()
+            return tryToExtractBitmap()
         }
         is BitmapDrawable -> {
-            return this.tryToExtractBitmap(resources)
+            return tryToExtractBitmap(resources)
         }
         is VectorDrawable, is ShapeDrawable, is DrawerArrowDrawable -> {
-            return this.toBitmapOrNull(
-                this.intrinsicWidth,
-                this.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
+            return toBitmapOrNull(
+                intrinsicWidth,
+                intrinsicHeight,
+                Config.ARGB_8888
             )
         }
         else -> return null
@@ -172,8 +169,7 @@ internal fun Drawable.toBitmap(
 ): Bitmap {
     if (this is BitmapDrawable) {
         if (bitmap == null) {
-            // This is slightly better than returning an empty, zero-size bitmap.
-            throw IllegalArgumentException("bitmap is null")
+            return Bitmap.createBitmap(width, height, config ?: Config.ARGB_8888)
         }
         if (config == null || bitmap.config == config) {
             // Fast-path to return original. Bitmap.createScaledBitmap will do this check, but it
