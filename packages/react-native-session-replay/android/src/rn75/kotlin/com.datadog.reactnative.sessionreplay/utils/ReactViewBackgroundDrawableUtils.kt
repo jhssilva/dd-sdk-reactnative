@@ -1,12 +1,12 @@
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
+import com.datadog.android.internal.utils.densityNormalized
 import com.datadog.android.sessionreplay.model.MobileSegment
-import com.datadog.reactnative.sessionreplay.extensions.convertToDensityNormalized
+import com.datadog.reactnative.sessionreplay.extensions.getRadius
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
 import com.datadog.reactnative.sessionreplay.utils.formatAsRgba
 import com.facebook.react.common.annotations.UnstableReactNativeAPI
-import com.facebook.react.uimanager.LengthPercentage
 import com.facebook.react.uimanager.Spacing
 import com.facebook.react.uimanager.drawable.CSSBackgroundDrawable
 
@@ -81,7 +81,7 @@ internal class ReactViewBackgroundDrawableUtils : DrawableUtils() {
         pixelDensity: Float
     ): MobileSegment.ShapeBorder {
         val borderWidth =
-            backgroundDrawable.fullBorderWidth.toLong().convertToDensityNormalized(pixelDensity)
+            backgroundDrawable.fullBorderWidth.toLong().densityNormalized(pixelDensity)
         val borderColor = formatAsRgba(backgroundDrawable.getBorderColor(Spacing.ALL))
 
         return MobileSegment.ShapeBorder(
@@ -89,11 +89,6 @@ internal class ReactViewBackgroundDrawableUtils : DrawableUtils() {
             width = borderWidth
         )
     }
-
-    private fun LengthPercentage?.getRadius(width: Float, height: Float) = this
-        ?.resolve(width, height)
-        ?.let { (it.horizontal + it.vertical) / 2f }
-        ?: 0f
 
     private companion object {
         private const val COLOR_FIELD_NAME = "mColor"

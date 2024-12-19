@@ -10,8 +10,8 @@ import ReactViewBackgroundDrawableUtils
 import android.view.Gravity
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import com.datadog.android.internal.utils.densityNormalized
 import com.datadog.android.sessionreplay.model.MobileSegment
-import com.datadog.reactnative.sessionreplay.extensions.convertToDensityNormalized
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
 import com.datadog.reactnative.sessionreplay.utils.ReflectionUtils
 import com.datadog.reactnative.sessionreplay.utils.formatAsRgba
@@ -134,7 +134,7 @@ internal class ReactTextPropertiesResolver(
         val fontFamily = getFontFamily(shadowNodeWrapper)
             ?: textWireframe.textStyle.family
         val fontSize = getFontSize(shadowNodeWrapper)
-            ?.convertToDensityNormalized(pixelsDensity)
+            ?.densityNormalized(pixelsDensity)
             ?: textWireframe.textStyle.size
         val fontColor = getTextColor(shadowNodeWrapper)
             ?: textWireframe.textStyle.color

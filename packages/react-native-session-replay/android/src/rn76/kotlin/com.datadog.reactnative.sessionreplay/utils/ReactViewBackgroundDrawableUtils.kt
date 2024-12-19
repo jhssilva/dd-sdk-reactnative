@@ -1,29 +1,27 @@
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
-import com.datadog.android.internal.utils.densityNormalized
+import com.datadog.reactnative.sessionreplay.extensions.convertToDensityNormalized
 import com.datadog.android.sessionreplay.model.MobileSegment
+import com.datadog.reactnative.sessionreplay.extensions.getRadius
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
 import com.datadog.reactnative.sessionreplay.utils.formatAsRgba
+import com.facebook.react.common.annotations.UnstableReactNativeAPI
 import com.facebook.react.uimanager.Spacing
-import com.facebook.react.views.view.ReactViewBackgroundDrawable
+import com.facebook.react.uimanager.drawable.CSSBackgroundDrawable
 
-internal class ReactViewBackgroundDrawableUtils() : DrawableUtils() {
+internal class ReactViewBackgroundDrawableUtils : DrawableUtils() {
+    @OptIn(UnstableReactNativeAPI::class)
     override fun resolveShapeAndBorder(
         drawable: Drawable,
         opacity: Float,
         pixelDensity: Float
     ): Pair<MobileSegment.ShapeStyle?, MobileSegment.ShapeBorder?> {
-        if (drawable !is ReactViewBackgroundDrawable) {
+        if (drawable !is CSSBackgroundDrawable) {
             return null to null
         }
 
         val borderProps = resolveBorder(drawable, pixelDensity)
-        val cornerRadius = drawable
-            .fullBorderRadius
-            .toLong()
-            .densityNormalized(pixelDensity)
-
         val backgroundColor = getBackgroundColor(drawable)
         val colorHexString = if (backgroundColor != null) {
             formatAsRgba(backgroundColor)
@@ -34,12 +32,13 @@ internal class ReactViewBackgroundDrawableUtils() : DrawableUtils() {
         return MobileSegment.ShapeStyle(
             colorHexString,
             opacity,
-            cornerRadius
+            getBorderRadius(drawable)
         ) to borderProps
     }
 
+    @OptIn(UnstableReactNativeAPI::class)
     override fun getReactBackgroundFromDrawable(drawable: Drawable?): Drawable? {
-        if (drawable is ReactViewBackgroundDrawable) {
+        if (drawable is CSSBackgroundDrawable) {
             return drawable
         }
 
@@ -50,7 +49,7 @@ internal class ReactViewBackgroundDrawableUtils() : DrawableUtils() {
         if (drawable is LayerDrawable) {
             for (layerNumber in 0 until drawable.numberOfLayers) {
                 val layer = drawable.getDrawable(layerNumber)
-                if (layer is ReactViewBackgroundDrawable) {
+                if (layer is CSSBackgroundDrawable) {
                     return layer
                 }
             }
@@ -59,27 +58,36 @@ internal class ReactViewBackgroundDrawableUtils() : DrawableUtils() {
         return null
     }
 
+    @OptIn(UnstableReactNativeAPI::class)
+    private fun getBorderRadius(drawable: CSSBackgroundDrawable): Float {
+        val width = drawable.intrinsicWidth.toFloat()
+        val height = drawable.intrinsicHeight.toFloat()
+        return drawable.borderRadius.uniform?.getRadius(width, height) ?: 0f
+    }
+
+    @OptIn(UnstableReactNativeAPI::class)
+    private fun getBackgroundColor(
+        backgroundDrawable: CSSBackgroundDrawable
+    ): Int? {
+        return reflectionUtils.getDeclaredField(
+            backgroundDrawable,
+            COLOR_FIELD_NAME
+        ) as Int?
+    }
+
+    @OptIn(UnstableReactNativeAPI::class)
     private fun resolveBorder(
-        backgroundDrawable: ReactViewBackgroundDrawable,
+        backgroundDrawable: CSSBackgroundDrawable,
         pixelDensity: Float
     ): MobileSegment.ShapeBorder {
         val borderWidth =
-            backgroundDrawable.fullBorderWidth.toLong().densityNormalized(pixelDensity)
+            backgroundDrawable.fullBorderWidth.toLong().convertToDensityNormalized(pixelDensity)
         val borderColor = formatAsRgba(backgroundDrawable.getBorderColor(Spacing.ALL))
 
         return MobileSegment.ShapeBorder(
             color = borderColor,
             width = borderWidth
         )
-    }
-
-    private fun getBackgroundColor(
-        backgroundDrawable: ReactViewBackgroundDrawable
-    ): Int? {
-        return reflectionUtils.getDeclaredField(
-            backgroundDrawable,
-            COLOR_FIELD_NAME
-        ) as Int?
     }
 
     private companion object {
