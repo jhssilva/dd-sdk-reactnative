@@ -22,6 +22,7 @@
         "android/build.gradle",
         "android/detekt.yml",
         "android/gradle.properties",
+        "android/consumer-proguard-rules.pro",
         "android/src/**",
         "ios/Sources/**",
         "ios/DatadogSDKReactNativeSessionReplay.xcodeproj/project.xcworkspace/xcsharedata",
