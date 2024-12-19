@@ -113,7 +113,7 @@ internal class ReactEditTextMapper(
             )
         }
 
-        val bgDrawable = drawableUtils.getReactBackgroundFromDrawable(view.background)
+        val backgroundDrawable = drawableUtils.getReactBackgroundFromDrawable(view.background)
             ?: return null
 
         val density = mappingContext.systemInformation.screenDensity
@@ -129,7 +129,7 @@ internal class ReactEditTextMapper(
         )
 
         val (shape, border) = drawableUtils.resolveShapeAndBorder(
-            bgDrawable,
+            backgroundDrawable,
             view.alpha,
             mappingContext.systemInformation.screenDensity
         )
