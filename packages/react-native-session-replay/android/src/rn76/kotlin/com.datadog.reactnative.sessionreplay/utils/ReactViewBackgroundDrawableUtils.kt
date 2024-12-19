@@ -1,7 +1,7 @@
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
-import com.datadog.android.internal.utils.densityNormalized
+import com.datadog.reactnative.sessionreplay.extensions.convertToDensityNormalized
 import com.datadog.android.sessionreplay.model.MobileSegment
 import com.datadog.reactnative.sessionreplay.extensions.getRadius
 import com.datadog.reactnative.sessionreplay.utils.DrawableUtils
@@ -81,7 +81,7 @@ internal class ReactViewBackgroundDrawableUtils : DrawableUtils() {
         pixelDensity: Float
     ): MobileSegment.ShapeBorder {
         val borderWidth =
-            backgroundDrawable.fullBorderWidth.toLong().densityNormalized(pixelDensity)
+            backgroundDrawable.fullBorderWidth.toLong().convertToDensityNormalized(pixelDensity)
         val borderColor = formatAsRgba(backgroundDrawable.getBorderColor(Spacing.ALL))
 
         return MobileSegment.ShapeBorder(
