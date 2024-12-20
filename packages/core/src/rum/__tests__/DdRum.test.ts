@@ -454,8 +454,9 @@ describe('DdRum', () => {
                 const traceUUID = DdRum.generateUUID(TracingIdType.trace);
 
                 expect(traceUUID).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(traceUUID)).toBeGreaterThan(0n); // Ensure it's a valid positive number
+                expect(traceUUID).toMatch(/^[0-9a-f]{32}$/); // Ensure the value is in paddedHex format
             });
+
             it('generates a valid span id in decimal format', () => {
                 const spanUUID = DdRum.generateUUID(TracingIdType.span);
 

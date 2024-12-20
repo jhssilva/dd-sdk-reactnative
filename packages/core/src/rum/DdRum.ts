@@ -24,6 +24,7 @@ import { generateErrorEventMapper } from './eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from './eventMappers/resourceEventMapper';
 import { generateResourceEventMapper } from './eventMappers/resourceEventMapper';
 import {
+    TracingIdFormat,
     TracingIdType,
     TracingIdentifier
 } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
@@ -231,10 +232,14 @@ class DdRumWrapper implements DdRumType {
 
     generateUUID = (type: TracingIdType): string => {
         if (type === TracingIdType.trace) {
-            return TracingIdentifier.createTraceId().id.toString();
+            return TracingIdentifier.createTraceId().toString(
+                TracingIdFormat.paddedHex
+            );
         }
 
-        return TracingIdentifier.createSpanId().id.toString();
+        return TracingIdentifier.createSpanId().toString(
+            TracingIdFormat.decimal
+        );
     };
 
     addError = (
