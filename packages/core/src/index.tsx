@@ -33,6 +33,7 @@ import { DdTrace } from './trace/DdTrace';
 import { DefaultTimeProvider } from './utils/time-provider/DefaultTimeProvider';
 import { TimeProvider } from './utils/time-provider/TimeProvider';
 import type { Timestamp } from './utils/time-provider/TimeProvider';
+import { TracingIdType } from './rum/instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
 
 /* eslint-enable arca/import-ordering */
 
@@ -61,7 +62,8 @@ export {
     DefaultTimeProvider,
     DATADOG_GRAPH_QL_OPERATION_TYPE_HEADER,
     DATADOG_GRAPH_QL_OPERATION_NAME_HEADER,
-    DATADOG_GRAPH_QL_VARIABLES_HEADER
+    DATADOG_GRAPH_QL_VARIABLES_HEADER,
+    TracingIdType
 };
 
 export type { Timestamp };
