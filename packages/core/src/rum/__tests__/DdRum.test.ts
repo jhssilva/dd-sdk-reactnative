@@ -18,6 +18,7 @@ import type { ActionEventMapper } from '../eventMappers/actionEventMapper';
 import type { ErrorEventMapper } from '../eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from '../eventMappers/resourceEventMapper';
 import { TracingIdType } from '../instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
+import { TracingIdentifierUtils } from '../instrumentation/resourceTracking/distributedTracing/__tests__/__utils__/TracingIdentifierUtils';
 import { ErrorSource, PropagatorType, RumActionType } from '../types';
 
 jest.mock('../../utils/time-provider/DefaultTimeProvider', () => {
@@ -451,17 +452,33 @@ describe('DdRum', () => {
         });
 
         describe('DdRum.generateUUID', () => {
-            it('generates a valid trace id in decimal format', () => {
-                const traceUUID = DdRum.generateUUID(TracingIdType.trace);
+            it('generates a valid trace id in paddedHex format', () => {
+                const uuid = DdRum.generateUUID(TracingIdType.trace);
 
-                expect(traceUUID).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(traceUUID).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
+                expect(uuid).toBeDefined(); // Ensure the value is defined
+                expect(BigInt(uuid, 16).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
+                expect(TracingIdentifierUtils.isWithin128Bits(uuid)).toBe(true); // Ensure the value is within 128 bits
+                expect(uuid).toMatch(/^[0-9a-f]{32}$/); // Ensure the value is in paddedHex format
             });
-            it('generates a valid span id in decimal format', () => {
-                const spanUUID = DdRum.generateUUID(TracingIdType.span);
 
-                expect(spanUUID).toBeDefined();
-                expect(BigInt(spanUUID).greater(BigInt(0))).toBe(true);
+            it('generates a valid span id in decimal format', () => {
+                const uuid = DdRum.generateUUID(TracingIdType.span);
+
+                expect(uuid).toBeDefined(); // Ensure the value is defined
+                expect(BigInt(uuid).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
+                expect(TracingIdentifierUtils.isWithin64Bits(uuid)).toBe(true); // Ensure the value is within 64 bits
+                expect(uuid).toMatch(/^[0-9]+$/); // Ensure the value contains only decimal digits
+            });
+
+            it('falls back to 64 bit span id when wrong tracingIdType is passed', () => {
+                const uuid = DdRum.generateUUID(
+                    ('wrong' as unknown) as TracingIdType
+                );
+
+                expect(uuid).toBeDefined(); // Ensure the value is defined
+                expect(BigInt(uuid).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
+                expect(TracingIdentifierUtils.isWithin64Bits(uuid)).toBe(true); // Ensure the value is within 64 bits
+                expect(uuid).toMatch(/^[0-9]+$/); // Ensure the value contains only decimal digits
             });
         });
 
