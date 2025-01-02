@@ -9,21 +9,28 @@ import XCTest
 @_spi(Internal)
 @testable import DatadogSessionReplay
 import React
+import DatadogInternal
 
 let BACKGROUND_RECT = CGRect(x: 50, y: 50, width: 100, height: 100)
 // Simulates view with padding vertical of 10 and horizontal of 20.
 let INNER_TEXT_RECT = CGRect(x: 20, y: 10, width: 60, height: 80) // position inside the background view
 
+internal class NoOpTelemetry: Telemetry {
+    func send(telemetry: DatadogInternal.TelemetryMessage) {}
+}
+
 internal class RCTTextViewRecorderTests: XCTestCase {
     let mockAttributes = SessionReplayViewAttributes(
         frame: BACKGROUND_RECT,
+        clip: .zero,
         backgroundColor: UIColor.white.cgColor,
         layerBorderColor: UIColor.blue.cgColor,
         layerBorderWidth: CGFloat(1.0),
         layerCornerRadius: CGFloat(1.0),
         alpha: CGFloat(1.0),
         isHidden: false,
-        intrinsicContentSize: CGSize(width: 100.0, height: 100.0)
+        intrinsicContentSize: CGSize(width: 100.0, height: 100.0),
+        overrides: .init(UIView())
     )
 
     let mockAllowContext = SessionReplayViewTreeRecordingContext(
@@ -33,11 +40,15 @@ internal class RCTTextViewRecorderTests: XCTestCase {
                         applicationID: "app_id",
                         sessionID: "session_id",
                         viewID: "view_id",
-                        viewServerTimeOffset: nil
+                        viewServerTimeOffset: nil,
+                        date: Date(),
+                        telemetry: NoOpTelemetry()
                        ),
         coordinateSpace: UIView(),
         ids: .init(),
-        webViewCache: .init())
+        webViewCache: .init(),
+        clip: .zero
+    )
 
     var mockShadowView: RCTTextShadowView {
         // The shadow view must be initialized with a bridge so that we can insert React Subviews into it.
@@ -146,10 +157,14 @@ internal class RCTTextViewRecorderTests: XCTestCase {
                 applicationID: "app_id",
                 sessionID: "session_id",
                 viewID: "view_id",
-                viewServerTimeOffset: nil),
+                viewServerTimeOffset: nil,
+                date: Date(),
+                telemetry: NoOpTelemetry()
+            ),
             coordinateSpace: UIView(),
             ids: .init(),
-            webViewCache: .init()
+            webViewCache: .init(),
+            clip: .zero
         )
         let reactTag = NSNumber(value: 44)
         let uiManagerMock = MockUIManager(reactTag: reactTag, shadowView: mockShadowView)

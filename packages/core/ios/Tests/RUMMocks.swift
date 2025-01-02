@@ -178,6 +178,7 @@ func mockRandomAttributes() -> [String: Codable] {
 extension RUMUser {
     static func mockRandom() -> RUMUser {
         return RUMUser(
+            anonymousId: .mockRandom(),
             email: .mockRandom(),
             id: .mockRandom(),
             name: .mockRandom(),
@@ -280,6 +281,7 @@ extension RUMResourceEvent: RandomMockable {
             resource: .init(
                 connect: .init(duration: .mockRandom(), start: .mockRandom()),
                 decodedBodySize: .mockRandom(),
+                deliveryType: [.cache, .navigationalPrefetch, .other].randomElement(),
                 dns: .init(duration: .mockRandom(), start: .mockRandom()),
                 download: .init(duration: .mockRandom(), start: .mockRandom()),
                 duration: .mockRandom(),
@@ -290,6 +292,7 @@ extension RUMResourceEvent: RandomMockable {
                     operationType: [.query, .mutation, .subscription].randomElement()!),
                 id: .mockRandom(),
                 method: .mockRandom(),
+                protocol: .mockRandom(),
                 provider: .init(
                     domain: .mockRandom(),
                     name: .mockRandom(),
@@ -302,7 +305,8 @@ extension RUMResourceEvent: RandomMockable {
                 statusCode: .mockRandom(),
                 transferSize: .mockRandom(),
                 type: [.native, .image].randomElement()!,
-                url: .mockRandom()
+                url: .mockRandom(),
+                worker: .init(duration: .mockRandom(), start: .mockRandom())
             ),
             service: .mockRandom(),
             session: .init(
@@ -348,6 +352,7 @@ extension RUMResourceEvent: RandomMockable {
             resource: .init(
                 connect: .init(duration: .mockRandom(), start: .mockRandom()),
                 decodedBodySize: .mockRandom(),
+                deliveryType: [.cache, .navigationalPrefetch, .other].randomElement(),
                 dns: .init(duration: .mockRandom(), start: .mockRandom()),
                 download: .init(duration: .mockRandom(), start: .mockRandom()),
                 duration: .mockRandom(),
@@ -358,6 +363,7 @@ extension RUMResourceEvent: RandomMockable {
                     operationType: [.query, .mutation, .subscription].randomElement()!),
                 id: .mockRandom(),
                 method: .mockRandom(),
+                protocol: .mockRandom(),
                 provider: .init(
                     domain: .mockRandom(),
                     name: .mockRandom(),
@@ -370,7 +376,8 @@ extension RUMResourceEvent: RandomMockable {
                 statusCode: .mockRandom(),
                 transferSize: .mockRandom(),
                 type: [.native, .image].randomElement()!,
-                url: .mockRandom()
+                url: .mockRandom(),
+                worker: .init(duration: .mockRandom(), start: .mockRandom())
             ),
             service: .mockRandom(),
             session: .init(
