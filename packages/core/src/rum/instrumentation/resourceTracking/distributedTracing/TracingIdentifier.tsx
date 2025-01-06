@@ -4,6 +4,9 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import type { BigInteger } from 'big-integer';
+import BigInt from 'big-integer';
+
 /**
  * Available formats for representing the {@link TracingIdentifier} as a string.
  */
@@ -85,13 +88,16 @@ export enum TracingIdType {
 /**
  * Value used to mask the low 64 bits of the trace identifier.
  */
-const LOW_64BIT_MASK =
-    (BigInt('0xffffffff') << BigInt(32)) + BigInt('0xffffffff');
+const LOW_64BIT_MASK: BigInteger = BigInt('ffffffff', 16)
+    .shiftLeft(32)
+    .add(BigInt('ffffffff', 16));
 
 /**
  * Value used to mask the low 32 bits of the trace identifier.
  */
-const LOW_32BIT_MASK = (BigInt('0xffff') << BigInt(16)) + BigInt('0xffff');
+const LOW_32BIT_MASK: BigInteger = BigInt('ffff', 16)
+    .shiftLeft(16)
+    .add(BigInt('ffff', 16));
 
 /**
  * A {@link TracingIdentifier} is a unique UUID that can be 64bit or 128bit, and provides
@@ -103,9 +109,9 @@ const LOW_32BIT_MASK = (BigInt('0xffff') << BigInt(16)) + BigInt('0xffff');
  */
 export class TracingIdentifier {
     /**
-     * Read-only generated ID as a {@link bigint}.
+     * Read-only generated ID as a {@link BigInteger}.
      */
-    readonly id: bigint;
+    readonly id: BigInteger;
 
     /**
      * Read-only type to determine whether the identifier is a {@link TraceId} or a {@link SpanId}.
@@ -140,9 +146,9 @@ export class TracingIdentifier {
     /**
      * Generates a unique ID with the given format.
      * @param format - the desired format (64bit or 128bit).
-     * @returns the generated UUID as a {@link bigint}.
+     * @returns the generated UUID as a {@link BigInteger}.
      */
-    private generateUUID(type: TracingIdType): bigint {
+    private generateUUID(type: TracingIdType): BigInteger {
         // Get the current Unix timestamp in seconds
         const unixSeconds = Math.floor(Date.now() / 1000);
 
@@ -161,7 +167,7 @@ export class TracingIdentifier {
 
         // If type is 'span' we return the generated 64 bit ID
         if (type === TracingIdType.span) {
-            return BigInt(`0x${random64Hex}`);
+            return BigInt(random64Hex, 16);
         }
 
         // Convert parts to hexadecimal strings
@@ -171,7 +177,7 @@ export class TracingIdentifier {
         // Combine parts to form the 128-bit ID
         const hex128BitID = unixSecondsHex + zerosHex + random64Hex;
 
-        return BigInt(`0x${hex128BitID}`);
+        return BigInt(hex128BitID, 16);
     }
 
     /**
@@ -191,19 +197,19 @@ export class TracingIdentifier {
                 return this.id.toString(10);
 
             case TracingIdFormat.lowDecimal:
-                return (this.id & lowTraceMask).toString(10);
+                return this.id.and(lowTraceMask).toString(10);
 
             case TracingIdFormat.highDecimal:
-                return (this.id >> highTraceMask).toString(10);
+                return this.id.shiftRight(highTraceMask).toString(10);
 
             case TracingIdFormat.hex:
                 return this.id.toString(16);
 
             case TracingIdFormat.lowHex:
-                return (this.id & lowTraceMask).toString(16);
+                return this.id.and(lowTraceMask).toString(16);
 
             case TracingIdFormat.highHex:
-                return (this.id >> highTraceMask).toString(16);
+                return this.id.shiftRight(highTraceMask).toString(16);
 
             case TracingIdFormat.paddedHex:
                 return this.toString(TracingIdFormat.hex).padStart(

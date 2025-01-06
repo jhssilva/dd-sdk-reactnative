@@ -4,6 +4,8 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import BigInt from 'big-integer';
+
 import type { PropagatorType } from '../../../types';
 import type { RegexMap } from '../requestProxy/interfaces/RequestProxy';
 
@@ -13,7 +15,7 @@ import type { Hostname } from './firstPartyHosts';
 import { getPropagatorsForHost } from './firstPartyHosts';
 
 const knuthFactor = BigInt('1111111111111111111');
-const twoPow64 = BigInt('0x10000000000000000'); // 2n ** 64n
+const twoPow64 = BigInt('10000000000000000', 16); // 2n ** 64n
 
 export type DdRumResourceTracingAttributes =
     | {
@@ -66,7 +68,7 @@ const generateTracingAttributesWithSampling = (
     propagatorTypes: PropagatorType[]
 ): DdRumResourceTracingAttributes => {
     const traceId = TracingIdentifier.createTraceId();
-    const hash = Number((traceId.id * knuthFactor) % twoPow64);
+    const hash = Number(traceId.id.multiply(knuthFactor).remainder(twoPow64));
     const threshold = (tracingSamplingRate / 100) * Number(twoPow64);
     const isSampled = hash <= threshold;
 

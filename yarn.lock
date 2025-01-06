@@ -2653,6 +2653,7 @@ __metadata:
   resolution: "@datadog/mobile-react-native@workspace:packages/core"
   dependencies:
     "@testing-library/react-native": 7.0.2
+    big-integer: ^1.6.52
     react-native-builder-bob: 0.26.0
   peerDependencies:
     react: ">=16.13.1"
@@ -7405,7 +7406,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"big-integer@npm:1.6.x":
+"big-integer@npm:1.6.x, big-integer@npm:^1.6.52":
   version: 1.6.52
   resolution: "big-integer@npm:1.6.52"
   checksum: 6e86885787a20fed96521958ae9086960e4e4b5e74d04f3ef7513d4d0ad631a9f3bde2730fc8aaa4b00419fc865f6ec573e5320234531ef37505da7da192c40b

@@ -4,6 +4,8 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import BigInt from 'big-integer';
+
 import { TracingIdentifier, TracingIdFormat } from '../TracingIdentifier';
 
 import { TracingIdentifierUtils } from './__utils__/TracingIdentifierUtils';

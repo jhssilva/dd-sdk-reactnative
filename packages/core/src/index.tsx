@@ -5,7 +5,6 @@
  */
 /* eslint-disable arca/import-ordering */
 
-import './polyfills';
 import {
     DatadogProviderConfiguration,
     DdSdkReactNativeConfiguration,

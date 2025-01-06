@@ -5,6 +5,7 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import BigInt from 'big-integer';
 import { NativeModules } from 'react-native';
 
 import { InternalLog } from '../../InternalLog';
@@ -454,13 +455,13 @@ describe('DdRum', () => {
                 const traceUUID = DdRum.generateUUID(TracingIdType.trace);
 
                 expect(traceUUID).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(traceUUID)).toBeGreaterThan(0n); // Ensure it's a valid positive number
+                expect(BigInt(traceUUID).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
             });
             it('generates a valid span id in decimal format', () => {
                 const spanUUID = DdRum.generateUUID(TracingIdType.span);
 
                 expect(spanUUID).toBeDefined();
-                expect(BigInt(spanUUID)).toBeGreaterThan(0n);
+                expect(BigInt(spanUUID).greater(BigInt(0))).toBe(true);
             });
         });
 

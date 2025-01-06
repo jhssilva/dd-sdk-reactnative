@@ -3,6 +3,7 @@
  * This product includes software developed at Datadog (https://www.datadoghq.com/).
  * Copyright 2016-Present Datadog, Inc.
  */
+import BigInt from 'big-integer';
 
 export class TracingIdentifierUtils {
     /**
@@ -30,8 +31,9 @@ export class TracingIdentifierUtils {
         idString: string,
         radix: number = 10
     ): boolean {
-        const bigIntValue = BigInt(parseInt(idString, radix));
-        return bigIntValue < BigInt(1) << BigInt(32);
+        return BigInt(parseInt(idString, radix)).lesser(
+            BigInt(1).shiftLeft(32)
+        );
     }
 
     /**
@@ -44,8 +46,9 @@ export class TracingIdentifierUtils {
         idString: string,
         radix: number = 10
     ): boolean {
-        const bigIntValue = BigInt(parseInt(idString, radix));
-        return bigIntValue < BigInt(1) << BigInt(64);
+        return BigInt(parseInt(idString, radix)).lesser(
+            BigInt(1).shiftLeft(64)
+        );
     }
 
     /**
@@ -58,7 +61,8 @@ export class TracingIdentifierUtils {
         idString: string,
         radix: number = 10
     ): boolean {
-        const bigIntValue = BigInt(parseInt(idString, radix));
-        return bigIntValue < BigInt(1) << BigInt(128);
+        return BigInt(parseInt(idString, radix)).lesser(
+            BigInt(1).shiftLeft(128)
+        );
     }
 }
