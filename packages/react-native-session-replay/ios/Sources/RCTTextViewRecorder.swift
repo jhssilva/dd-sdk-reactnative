@@ -139,11 +139,11 @@ internal struct RCTTextViewWireframesBuilder: SessionReplayNodeWireframesBuilder
             builder.createTextWireframe(
                 id: wireframeID,
                 frame: relativeIntersectedRect,
+                clip: attributes.clip,
                 text: textObfuscator.mask(text: text ?? ""),
                 textFrame: textFrame,
                 // Text alignment is top for all RCTTextView components.
                 textAlignment: .init(systemTextAlignment: textAlignment, vertical: .top),
-                clip: clip,
                 textColor: textColor ?? DEFAULT_COLOR,
                 fontOverride: SessionReplayWireframesBuilder.FontOverride(size: fontSize.isNaN ? DEFAULT_FONT_SIZE : fontSize),
                 borderColor: attributes.layerBorderColor,
