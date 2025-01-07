@@ -96,5 +96,8 @@
         "android": {
             "javaPackageName": "com.datadog.reactnative"
         }
+    },
+    "dependencies": {
+        "big-integer": "^1.6.52"
     }
 }

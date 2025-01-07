@@ -4,6 +4,7 @@
  * Copyright 2016-Present Datadog, Inc.
  */
 
+import BigInt from 'big-integer';
 import { Platform, NativeModules } from 'react-native';
 
 import { InternalLog } from '../../../../../../InternalLog';
@@ -58,7 +59,7 @@ const flushPromises = () =>
 let xhrProxy;
 
 const hexToDecimal = (hex: string): string => {
-    return BigInt(`0x${hex}`).toString(10);
+    return BigInt(hex, 16).toString(10);
 };
 
 beforeEach(() => {
