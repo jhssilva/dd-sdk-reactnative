@@ -15,17 +15,24 @@ public class DdSessionReplayImplementation: NSObject {
     private lazy var sessionReplay: SessionReplayProtocol = sessionReplayProvider()
     private let sessionReplayProvider: () -> SessionReplayProtocol
     private let uiManager: RCTUIManager
+    private let fabricWrapper: RCTFabricWrapper
     
-    internal init(sessionReplayProvider: @escaping () -> SessionReplayProtocol, uiManager: RCTUIManager) {
+    internal init(
+        sessionReplayProvider: @escaping () -> SessionReplayProtocol,
+        uiManager: RCTUIManager,
+        fabricWrapper: RCTFabricWrapper
+    ) {
         self.sessionReplayProvider = sessionReplayProvider
         self.uiManager = uiManager
+        self.fabricWrapper = fabricWrapper
     }
 
     @objc
     public convenience init(bridge: RCTBridge) {
         self.init(
             sessionReplayProvider: { NativeSessionReplay() },
-            uiManager: bridge.uiManager
+            uiManager: bridge.uiManager,
+            fabricWrapper: RCTFabricWrapper()
         )
     }
 
@@ -44,6 +51,7 @@ public class DdSessionReplayImplementation: NSObject {
         if (customEndpoint != "") {
             customEndpointURL = URL(string: "\(customEndpoint)/api/v2/replay" as String)
         }
+
         var sessionReplayConfiguration = SessionReplay.Configuration(
             replaySampleRate: Float(replaySampleRate),
             textAndInputPrivacyLevel: convertTextAndInputPrivacy(textAndInputPrivacyLevel),
@@ -53,7 +61,9 @@ public class DdSessionReplayImplementation: NSObject {
             customEndpoint: customEndpointURL
         )
                     
-        sessionReplayConfiguration.setAdditionalNodeRecorders([RCTTextViewRecorder(uiManager: self.uiManager)])
+        sessionReplayConfiguration.setAdditionalNodeRecorders([
+            RCTTextViewRecorder(uiManager: uiManager, fabricWrapper: fabricWrapper)
+        ])
 
         if let core = DatadogSDKWrapper.shared.getCoreInstance() {
             sessionReplay.enable(
