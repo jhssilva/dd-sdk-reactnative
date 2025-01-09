@@ -24,6 +24,7 @@ import { generateErrorEventMapper } from './eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from './eventMappers/resourceEventMapper';
 import { generateResourceEventMapper } from './eventMappers/resourceEventMapper';
 import {
+    TracingIdFormat,
     TracingIdType,
     TracingIdentifier
 } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
@@ -230,11 +231,23 @@ class DdRumWrapper implements DdRumType {
     };
 
     generateUUID = (type: TracingIdType): string => {
-        if (type === TracingIdType.trace) {
-            return TracingIdentifier.createTraceId().id.toString();
+        switch (type) {
+            case TracingIdType.trace:
+                return TracingIdentifier.createTraceId().toString(
+                    TracingIdFormat.paddedHex
+                );
+            case TracingIdType.span:
+                return TracingIdentifier.createSpanId().toString(
+                    TracingIdFormat.decimal
+                );
+            default:
+                console.warn(
+                    `Unsupported tracing ID type '${type}' for generateUUID. Falling back to 64 bit Span ID.`
+                );
+                return TracingIdentifier.createSpanId().toString(
+                    TracingIdFormat.decimal
+                );
         }
-
-        return TracingIdentifier.createSpanId().id.toString();
     };
 
     addError = (
