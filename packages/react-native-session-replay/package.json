@@ -35,7 +35,7 @@
     "source": "src",
     "module": "lib/module/index",
     "publishConfig": {
-        "access": "restricted"
+        "access": "public"
     },
     "scripts": {
         "test": "jest",
