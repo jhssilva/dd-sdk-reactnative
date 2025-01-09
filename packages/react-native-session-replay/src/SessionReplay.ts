@@ -124,7 +124,7 @@ type InternalSessionReplayConfiguration = InternalBaseSessionReplayConfiguration
 const DEFAULTS: InternalSessionReplayConfiguration & {
     defaultPrivacyLevel: SessionReplayPrivacy;
 } = {
-    replaySampleRate: 0,
+    replaySampleRate: 100,
     defaultPrivacyLevel: SessionReplayPrivacy.MASK,
     customEndpoint: '',
     imagePrivacyLevel: ImagePrivacyLevel.MASK_ALL,

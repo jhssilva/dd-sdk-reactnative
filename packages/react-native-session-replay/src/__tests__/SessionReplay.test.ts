@@ -32,7 +32,7 @@ describe('SessionReplay', () => {
             SessionReplay.enable();
 
             expect(NativeModules.DdSessionReplay.enable).toHaveBeenCalledWith(
-                0,
+                100,
                 '',
                 'MASK_ALL',
                 'HIDE',
