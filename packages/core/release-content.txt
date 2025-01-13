@@ -112,8 +112,6 @@ package/lib/commonjs/logs/types.js
 package/lib/commonjs/logs/types.js.map
 package/lib/commonjs/nativeModulesTypes.js
 package/lib/commonjs/nativeModulesTypes.js.map
-package/lib/commonjs/polyfills.js
-package/lib/commonjs/polyfills.js.map
 package/lib/commonjs/rum/DdAttributes.js
 package/lib/commonjs/rum/DdAttributes.js.map
 package/lib/commonjs/rum/DdRum.js
@@ -248,8 +246,6 @@ package/lib/module/logs/types.js
 package/lib/module/logs/types.js.map
 package/lib/module/nativeModulesTypes.js
 package/lib/module/nativeModulesTypes.js.map
-package/lib/module/polyfills.js
-package/lib/module/polyfills.js.map
 package/lib/module/rum/DdAttributes.js
 package/lib/module/rum/DdAttributes.js.map
 package/lib/module/rum/DdRum.js
@@ -520,7 +516,6 @@ package/src/logs/__tests__/eventMapper.test.ts
 package/src/logs/eventMapper.ts
 package/src/logs/types.ts
 package/src/nativeModulesTypes.ts
-package/src/polyfills.js
 package/src/rum/DdAttributes.ts
 package/src/rum/DdRum.ts
 package/src/rum/__mocks__/MockTimeProvider.ts
