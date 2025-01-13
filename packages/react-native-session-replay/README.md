@@ -4,7 +4,7 @@ Mobile Session Replay expands visibility into your mobile applications by visual
 
 ## Setup
 
-**Note:** Make sure you’ve setup and initialized the [Datadog React Native SDK][1] with views instrumentation enabled.
+**Note**: Make sure you’ve setup and initialized the [Datadog React Native SDK][1] with views instrumentation enabled.
 
 To install with NPM, run:
 
@@ -26,14 +26,14 @@ To enable Session Replay, import and call the `enable` method with your configur
 import { SessionReplay } from "@datadog/mobile-react-native-session-replay";
 
 SessionReplay.enable({
-    replaySampleRate: sampleRate // The percentage of sampled replays, in the range 0.0 - 100.0 (Default: 100.0).
+    replaySampleRate: sampleRate, // The percentage of sampled replays, in the range 0.0 - 100.0 (Default: 100.0).
     textAndInputPrivacyLevel: TextAndInputPrivacyLevel.MASK_ALL, // Defines the way text and input (e.g text fields, checkboxes) should be masked (Default: `MASK_ALL`).
     imagePrivacyLevel: ImagePrivacyLevel.MASK_ALL, // Defines the way images should be masked (Default: `MASK_ALL`).
     touchPrivacyLevel: TouchPrivacyLevel.HIDE  // Defines the way user touches (e.g tap) should be masked (Default: `HIDE`).
 });
 ```
 
-**Note:**: All configuration properties are optional and should be adjusted based on your application's needs.
+**Note**: All configuration properties are optional and should be adjusted based on your application's needs.
 
 ## Start or stop the recording manually
 
