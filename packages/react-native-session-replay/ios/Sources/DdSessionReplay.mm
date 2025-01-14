@@ -38,12 +38,12 @@ RCT_REMAP_METHOD(enable, withEnableReplaySampleRate:(double)replaySampleRate
 
 RCT_EXPORT_METHOD(startRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 {
-    [self startRecordingWithResolver:resolve reject:reject];
+    [self startRecording:resolve reject:reject];
 }
 
 RCT_EXPORT_METHOD(stopRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RCTPromiseRejectBlock)reject)
 {
-    [self stopRecordingWithResolver:resolve reject:reject];
+    [self stopRecording:resolve reject:reject];
 }
 
 // Thanks to this guard, we won't compile this code when we build for the old architecture.
@@ -85,11 +85,11 @@ RCT_EXPORT_METHOD(stopRecording:(RCTPromiseResolveBlock)resolve withRejecter:(RC
                                                             reject:reject];
 }
 
-- (void)startRecordingWithResolver:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+- (void)startRecording:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
     [self.ddSessionReplayImplementation startRecordingWithResolve:resolve reject:reject];
 }
 
-- (void)stopRecordingWithResolver:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
+- (void)stopRecording:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
     [self.ddSessionReplayImplementation stopRecordingWithResolve:resolve reject:reject];
 }
 
