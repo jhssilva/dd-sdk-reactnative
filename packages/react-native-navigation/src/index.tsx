@@ -10,3 +10,5 @@ import { DdRumReactNativeNavigationTracking } from './rum/instrumentation/DdRumR
 export { DdRumReactNativeNavigationTracking };
 
 export type { ViewNamePredicate };
+
+export * from 'react-native-navigation';
