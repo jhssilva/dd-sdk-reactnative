@@ -16,12 +16,10 @@ const modules = Object.keys({
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = {};
-
-module.exports = {
+const config = {
   projectRoot: __dirname,
   watchFolders: [root],
-
+  resetCache: true,
   // We need to make sure that only one version is loaded for peerDependencies
   // So we blacklist them at the root, and alias them to the versions in example's node_modules
   // This block is very important, because otherwise things like React can be packed multiple times
@@ -38,7 +36,7 @@ module.exports = {
       acc[name] = path.join(__dirname, 'node_modules', name);
       return acc;
     }, {}),
-  }
+  },
 };
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);

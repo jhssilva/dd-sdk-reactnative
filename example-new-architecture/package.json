@@ -9,18 +9,20 @@
   },
   "dependencies": {
     "@datadog/mobile-react-native": "workspace:packages/core",
+    "@react-native-community/cli-platform-android": "13.6.9",
     "react": "18.2.0",
-    "react-native": "0.74.3"
+    "react-native": "0.74.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
-    "@react-native/babel-preset": "0.74.85",
-    "@react-native/eslint-config": "0.74.85",
-    "@react-native/gradle-plugin": "^0.74.1",
-    "@react-native/metro-config": "0.74.85",
-    "@react-native/typescript-config": "0.74.85",
+    "@react-native/babel-preset": "0.74.88",
+    "@react-native/codegen": "^0.74.88",
+    "@react-native/eslint-config": "0.74.88",
+    "@react-native/gradle-plugin": "^0.74.88",
+    "@react-native/metro-config": "0.74.88",
+    "@react-native/typescript-config": "0.74.88",
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",
