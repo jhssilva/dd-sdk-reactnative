@@ -17,27 +17,11 @@ internal class RCTTextViewRecorder: SessionReplayNodeRecorder {
     internal var identifier = UUID()
 
     internal let uiManager: RCTUIManager
+    internal let fabricWrapper: RCTFabricWrapper
 
-    internal init(uiManager: RCTUIManager) {
+    internal init(uiManager: RCTUIManager, fabricWrapper: RCTFabricWrapper) {
         self.uiManager = uiManager
-    }
-
-    internal func extractTextFromSubViews(
-        subviews: [RCTShadowView]?
-    ) -> String? {
-        if let subviews = subviews {
-            return subviews.compactMap { subview in
-                if let sub = subview as? RCTRawTextShadowView {
-                    return sub.text
-                }
-                if let sub = subview as? RCTVirtualTextShadowView {
-                    // We recursively get all subviews for nested Text components
-                    return extractTextFromSubViews(subviews: sub.reactSubviews())
-                }
-                return nil
-            }.joined()
-        }
-        return nil
+        self.fabricWrapper = fabricWrapper
     }
 
     public func semantics(
@@ -45,6 +29,48 @@ internal class RCTTextViewRecorder: SessionReplayNodeRecorder {
         with attributes: SessionReplayViewAttributes,
         in context: SessionReplayViewTreeRecordingContext
     ) -> SessionReplayNodeSemantics? {
+        guard
+            let textProperties = fabricWrapper.tryToExtractTextProperties(from: view) ?? tryToExtractTextProperties(view: view)
+        else {
+            return view is RCTTextView ? SessionReplayInvisibleElement.constant : nil
+        }
+
+        let builder = RCTTextViewWireframesBuilder(
+            wireframeID: context.ids.nodeID(view: view, nodeRecorder: self),
+            attributes: attributes,
+            text: textProperties.text,
+            textAlignment: textProperties.alignment,
+            textColor: textProperties.foregroundColor,
+            textObfuscator: textObfuscator(context),
+            fontSize: textProperties.fontSize,
+            contentRect: textProperties.contentRect
+        )
+
+        return SessionReplaySpecificElement(subtreeStrategy: .ignore, nodes: [
+            SessionReplayNode(viewAttributes: attributes, wireframesBuilder: builder)
+        ])
+    }
+
+    internal func tryToExtractTextFromSubViews(
+        subviews: [RCTShadowView]?
+    ) -> String? {
+        guard let subviews = subviews else {
+            return nil
+        }
+
+        return subviews.compactMap { subview in
+            if let sub = subview as? RCTRawTextShadowView {
+                return sub.text
+            }
+            if let sub = subview as? RCTVirtualTextShadowView {
+                // We recursively get all subviews for nested Text components
+                return tryToExtractTextFromSubViews(subviews: sub.reactSubviews())
+            }
+            return nil
+        }.joined()
+    }
+
+    private func tryToExtractTextProperties(view: UIView) -> RCTTextPropertiesWrapper? {
         guard let textView = view as? RCTTextView else {
             return nil
         }
@@ -56,41 +82,35 @@ internal class RCTTextViewRecorder: SessionReplayNodeRecorder {
             shadowView = uiManager.shadowView(forReactTag: tag) as? RCTTextShadowView
         }
 
-        if let shadow = shadowView {
-            // TODO: RUM-2173 check performance is ok
-            let text = extractTextFromSubViews(
-                subviews: shadow.reactSubviews()
-            )
-
-            let builder = RCTTextViewWireframesBuilder(
-                wireframeID: context.ids.nodeID(view: textView, nodeRecorder: self),
-                attributes: attributes,
-                text: text,
-                textAlignment: shadow.textAttributes.alignment,
-                textColor: shadow.textAttributes.foregroundColor?.cgColor,
-                textObfuscator: textObfuscator(context),
-                fontSize: shadow.textAttributes.fontSize,
-                contentRect: shadow.contentFrame
-            )
-            let node = SessionReplayNode(viewAttributes: attributes, wireframesBuilder: builder)
-            return SessionReplaySpecificElement(subtreeStrategy: .ignore, nodes: [node])
+        guard let shadow = shadowView else {
+            return nil
         }
-        return SessionReplayInvisibleElement.constant
+
+        let textProperties = RCTTextPropertiesWrapper()
+
+        // TODO: RUM-2173 check performance is ok
+        if let text = tryToExtractTextFromSubViews(subviews: shadow.reactSubviews()) {
+            textProperties.text = text
+        }
+
+        if let foregroundColor = shadow.textAttributes.foregroundColor {
+            textProperties.foregroundColor = foregroundColor
+        }
+
+        textProperties.alignment = shadow.textAttributes.alignment
+        textProperties.fontSize = shadow.textAttributes.fontSize
+        textProperties.contentRect = shadow.contentFrame
+
+        return textProperties
     }
 }
-
-// Black color. This is the default for RN: https://github.com/facebook/react-native/blob/a5ee029cd02a636136058d82919480eeeb700067/packages/react-native/Libraries/Text/RCTTextAttributes.mm#L250
-let DEFAULT_COLOR = UIColor.black.cgColor
-
-// Default font size for RN: https://github.com/facebook/react-native/blob/16dff523b0a16d7fa9b651062c386885c2f48a6b/packages/react-native/React/Views/RCTFont.mm#L396
-let DEFAULT_FONT_SIZE = CGFloat(14)
 
 internal struct RCTTextViewWireframesBuilder: SessionReplayNodeWireframesBuilder {
     let wireframeID: WireframeID
     let attributes: SessionReplayViewAttributes
-    let text: String?
+    let text: String
     var textAlignment: NSTextAlignment
-    let textColor: CGColor?
+    let textColor: UIColor
     let textObfuscator: SessionReplayTextObfuscating
     let fontSize: CGFloat
     let contentRect: CGRect
@@ -140,12 +160,12 @@ internal struct RCTTextViewWireframesBuilder: SessionReplayNodeWireframesBuilder
                 id: wireframeID,
                 frame: relativeIntersectedRect,
                 clip: attributes.clip,
-                text: textObfuscator.mask(text: text ?? ""),
+                text: textObfuscator.mask(text: text),
                 textFrame: textFrame,
-                // Text alignment is top for all RCTTextView components.
+                // Text alignment is top for all RCTTextView and RCTParagraphComponentView components.
                 textAlignment: .init(systemTextAlignment: textAlignment, vertical: .top),
-                textColor: textColor ?? DEFAULT_COLOR,
-                fontOverride: SessionReplayWireframesBuilder.FontOverride(size: fontSize.isNaN ? DEFAULT_FONT_SIZE : fontSize),
+                textColor: textColor.cgColor,
+                fontOverride: SessionReplayWireframesBuilder.FontOverride(size: fontSize.isNaN ? RCTTextPropertiesDefaultFontSize : fontSize),
                 borderColor: attributes.layerBorderColor,
                 borderWidth: attributes.layerBorderWidth,
                 backgroundColor: attributes.backgroundColor,

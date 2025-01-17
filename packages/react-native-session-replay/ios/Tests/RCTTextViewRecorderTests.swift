@@ -83,7 +83,8 @@ internal class RCTTextViewRecorderTests: XCTestCase {
     func testReturnsNilIfViewIsNotRCTTextView() {
         let viewMock = UIView()
         let uiManagerMock = MockUIManager()
-        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock)
+        let fabricWrapperMock = MockFabricWrapper()
+        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock, fabricWrapper: fabricWrapperMock)
         
         let result = viewRecorder.semantics(of: viewMock, with: mockAttributes, in: mockAllowContext)
         
@@ -93,9 +94,10 @@ internal class RCTTextViewRecorderTests: XCTestCase {
     func testReturnsInvisibleElementIfShadowViewIsNotFound() throws {
         let reactTag = NSNumber(value: 44)
         let uiManagerMock = MockUIManager()
+        let fabricWrapperMock = MockFabricWrapper()
         let viewMock = RCTTextView()
         viewMock.reactTag = reactTag
-        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock)
+        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock, fabricWrapper: fabricWrapperMock)
 
         let result = viewRecorder.semantics(of: viewMock, with: mockAttributes, in: mockAllowContext)
 
@@ -106,9 +108,10 @@ internal class RCTTextViewRecorderTests: XCTestCase {
     func testReturnsBuilderWithCorrectInformation() throws {
         let reactTag = NSNumber(value: 44)
         let uiManagerMock = MockUIManager(reactTag: reactTag, shadowView: mockShadowView)
+        let fabricWrapperMock = MockFabricWrapper()
         let viewMock = RCTTextView()
         viewMock.reactTag = reactTag
-        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock)
+        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock, fabricWrapper: fabricWrapperMock)
 
         let result = viewRecorder.semantics(of: viewMock, with: mockAttributes, in: mockAllowContext)
 
@@ -135,9 +138,10 @@ internal class RCTTextViewRecorderTests: XCTestCase {
     func testReturnsBuilderWithCorrectInformationWhenNestedTextComponents() throws {
         let reactTag = NSNumber(value: 44)
         let uiManagerMock = MockUIManager(reactTag: reactTag, shadowView: mockShadowViewNestedText)
+        let fabricWrapperMock = MockFabricWrapper()
         let viewMock = RCTTextView()
         viewMock.reactTag = reactTag
-        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock)
+        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock, fabricWrapper: fabricWrapperMock)
 
         let result = viewRecorder.semantics(of: viewMock, with: mockAttributes, in: mockAllowContext)
 
@@ -168,9 +172,10 @@ internal class RCTTextViewRecorderTests: XCTestCase {
         )
         let reactTag = NSNumber(value: 44)
         let uiManagerMock = MockUIManager(reactTag: reactTag, shadowView: mockShadowView)
+        let fabricWrapperMock = MockFabricWrapper()
         let viewMock = RCTTextView()
         viewMock.reactTag = reactTag
-        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock)
+        let viewRecorder = RCTTextViewRecorder(uiManager: uiManagerMock, fabricWrapper: fabricWrapperMock)
 
         let result = viewRecorder.semantics(of: viewMock, with: mockAttributes, in: mockMaskContext)
 
@@ -202,6 +207,12 @@ private class MockUIManager: RCTUIManager {
         return nil
     }
     
+}
+
+private class MockFabricWrapper: RCTFabricWrapper {
+    override func tryToExtractTextProperties(from view: UIView) -> RCTTextPropertiesWrapper? {
+        return nil
+    }
 }
 
 extension SessionReplayInvisibleElement: Equatable {

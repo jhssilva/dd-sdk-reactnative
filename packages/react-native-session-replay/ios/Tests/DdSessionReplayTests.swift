@@ -41,6 +41,7 @@ internal class DdSessionReplayTests: XCTestCase {
     func testEnablesSessionReplayWithZeroReplaySampleRate() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
+        let fabricWrapperMock = MockFabricWrapper()
         
         guard
             let imagePrivacyLevel = imagePrivacyMap.keys.randomElement(),
@@ -54,7 +55,11 @@ internal class DdSessionReplayTests: XCTestCase {
             return
         }
         
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+        DdSessionReplayImplementation(
+            sessionReplayProvider:{ sessionReplayMock },
+            uiManager: uiManagerMock,
+            fabricWrapper: fabricWrapperMock
+        ).enable(
             replaySampleRate: 0,
             customEndpoint: "",
             imagePrivacyLevel: NSString(string: imagePrivacyLevel),
@@ -77,8 +82,13 @@ internal class DdSessionReplayTests: XCTestCase {
     func testEnablesSessionReplayWithBadPrivacyLevels() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
+        let fabricWrapperMock = MockFabricWrapper()
     
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+        DdSessionReplayImplementation(
+            sessionReplayProvider:{ sessionReplayMock },
+            uiManager: uiManagerMock,
+            fabricWrapper: fabricWrapperMock
+        ).enable(
             replaySampleRate: 100,
             customEndpoint: "",
             imagePrivacyLevel: "BAD_VALUE",
@@ -101,6 +111,7 @@ internal class DdSessionReplayTests: XCTestCase {
     func testEnablesSessionReplayWithCustomEndpoint() {
         let sessionReplayMock = MockSessionReplay()
         let uiManagerMock = MockUIManager()
+        let fabricWrapperMock = MockFabricWrapper()
         
         guard
             let imagePrivacyLevel = imagePrivacyMap.keys.randomElement(),
@@ -114,7 +125,11 @@ internal class DdSessionReplayTests: XCTestCase {
             return
         }
         
-        DdSessionReplayImplementation(sessionReplayProvider:{ sessionReplayMock }, uiManager: uiManagerMock).enable(
+        DdSessionReplayImplementation(
+            sessionReplayProvider:{ sessionReplayMock },
+            uiManager: uiManagerMock,
+            fabricWrapper: fabricWrapperMock
+        ).enable(
             replaySampleRate: 100,
             customEndpoint: "https://session-replay.example.com",
             imagePrivacyLevel: NSString(string: imagePrivacyLevel),
@@ -174,6 +189,12 @@ private class MockSessionReplay: SessionReplayProtocol {
 }
 
 private class MockUIManager: RCTUIManager {}
+
+private class MockFabricWrapper: RCTFabricWrapper {
+    override func tryToExtractTextProperties(from view: UIView) -> RCTTextPropertiesWrapper? {
+        return nil
+    }
+}
 
 private class MockDatadogCore: DatadogCoreProtocol {
     func mostRecentModifiedFileAt(before: Date) throws -> Date? {
