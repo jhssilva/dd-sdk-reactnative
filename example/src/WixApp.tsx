@@ -12,10 +12,10 @@ import {
 
 import styles from './screens/styles';
 
-const viewPredicate: ViewNamePredicate = function customViewNamePredicate(
+const viewPredicate: ViewNamePredicate = (
     _event: ComponentDidAppearEvent,
     trackedName: string
-) {
+) => {
     return 'Custom RNN ' + trackedName;
 };
 
@@ -77,4 +77,3 @@ const HomeScreen = props => {
 };
 
 export { startReactNativeNavigation };
-

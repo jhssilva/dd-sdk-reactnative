@@ -63,7 +63,7 @@ yarn-error.log
 .metro-health-check*
 
 # Secrets
-ddCredentials.js
+ddCredentials.*
 
 # Yarn ignored files
 .pnp.*
