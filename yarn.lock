@@ -8854,6 +8854,7 @@ __metadata:
     axios: ^1.6.8
     babel-plugin-module-resolver: ^4.0.0
     patch-package: ^8.0.0
+    postinstall-postinstall: ^2.1.0
     react: 18.3.1
     react-native: 0.75.4
     react-native-crash-tester: 0.2.3
@@ -15501,6 +15502,13 @@ __metadata:
     cssesc: ^3.0.0
     util-deprecate: ^1.0.2
   checksum: 1c6a5adfc3c19c6e1e7d94f8addb89a5166fcca72c41f11713043d381ecbe82ce66360c5524e904e17b54f7fc9e6a077994ff31238a456bc7320c3e02e88d92e
+  languageName: node
+  linkType: hard
+
+"postinstall-postinstall@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "postinstall-postinstall@npm:2.1.0"
+  checksum: e1d34252cf8d2c5641c7d2db7426ec96e3d7a975f01c174c68f09ef5b8327bc8d5a9aa2001a45e693db2cdbf69577094d3fe6597b564ad2d2202b65fba76134b
   languageName: node
   linkType: hard
 
