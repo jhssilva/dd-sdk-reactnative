@@ -126,8 +126,10 @@ export type DdRumType = {
     /**
      * Generate a new unique tracing ID.
      * @param type - The type of the tracing ID to generate. Trace (128-bit) or Span (64-bit).
+     * @param propragator - The propagator to use for the generated tracing ID. Datadog, TraceContext, B3 or B3Multi.
+     * @returns The generated tracing ID.
      */
-    generateUUID(type: TracingIdType): string;
+    generateUUID(type: TracingIdType, propagator: PropagatorType): string;
 
     /**
      * Add a RUM Error.

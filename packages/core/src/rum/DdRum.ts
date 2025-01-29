@@ -26,13 +26,16 @@ import { generateResourceEventMapper } from './eventMappers/resourceEventMapper'
 import {
     TracingIdFormat,
     TracingIdType,
-    TracingIdentifier
+    TracingIdentifier,
+    type SpanId,
+    type TraceId
 } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
-import type {
-    ErrorSource,
-    DdRumType,
-    RumActionType,
-    ResourceKind
+import {
+    type ErrorSource,
+    type DdRumType,
+    type RumActionType,
+    type ResourceKind,
+    PropagatorType
 } from './types';
 
 const generateEmptyPromise = () => new Promise<void>(resolve => resolve());
@@ -230,25 +233,32 @@ class DdRumWrapper implements DdRumType {
         );
     };
 
-    generateUUID = (type: TracingIdType): string => {
-        switch (type) {
-            case TracingIdType.trace:
-                return TracingIdentifier.createTraceId().toString(
-                    TracingIdFormat.paddedHex
-                );
-            case TracingIdType.span:
-                return TracingIdentifier.createSpanId().toString(
-                    TracingIdFormat.decimal
-                );
-            default:
-                console.warn(
-                    `Unsupported tracing ID type '${type}' for generateUUID. Falling back to 64 bit Span ID.`
-                );
-                return TracingIdentifier.createSpanId().toString(
-                    TracingIdFormat.decimal
-                );
+    generateUUID = (type: TracingIdType, propagator: PropagatorType): string => {
+        if (type !== TracingIdType.trace && type !== TracingIdType.span) {
+            console.warn(
+                `Unsupported tracing ID type '${type}' for generateUUID. Falling back to 64 bit Span ID in Decimal Format.`
+            );
+            return TracingIdentifier.createSpanId().toString(TracingIdFormat.decimal);
         }
+
+        const tempUUID = this.createUUID(type);
+        return this.formatUUID(tempUUID, type, propagator);
     };
+
+    private createUUID(type: TracingIdType): TraceId | SpanId {
+        return type === TracingIdType.trace
+            ? TracingIdentifier.createTraceId()
+            : TracingIdentifier.createSpanId();
+    }
+
+    private formatUUID(id: TraceId | SpanId, type: TracingIdType, propagator: PropagatorType): string {
+        if (propagator === PropagatorType.DATADOG) {
+            return id.toString(type === TracingIdType.trace
+                ? TracingIdFormat.lowDecimal
+                : TracingIdFormat.decimal);
+        }
+        return id.toString(TracingIdFormat.paddedHex);
+    }
 
     addError = (
         message: string,
