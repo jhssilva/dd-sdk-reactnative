@@ -451,37 +451,6 @@ describe('DdRum', () => {
             });
         });
 
-        describe('DdRum.generateUUID', () => {
-            it('generates a valid trace id in paddedHex format', () => {
-                const uuid = DdRum.generateUUID(TracingIdType.trace);
-
-                expect(uuid).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(uuid, 16).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
-                expect(TracingIdentifierUtils.isWithin128Bits(uuid)).toBe(true); // Ensure the value is within 128 bits
-                expect(uuid).toMatch(/^[0-9a-f]{32}$/); // Ensure the value is in paddedHex format
-            });
-
-            it('generates a valid span id in decimal format', () => {
-                const uuid = DdRum.generateUUID(TracingIdType.span);
-
-                expect(uuid).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(uuid).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
-                expect(TracingIdentifierUtils.isWithin64Bits(uuid)).toBe(true); // Ensure the value is within 64 bits
-                expect(uuid).toMatch(/^[0-9]+$/); // Ensure the value contains only decimal digits
-            });
-
-            it('falls back to 64 bit span id when wrong tracingIdType is passed', () => {
-                const uuid = DdRum.generateUUID(
-                    ('wrong' as unknown) as TracingIdType
-                );
-
-                expect(uuid).toBeDefined(); // Ensure the value is defined
-                expect(BigInt(uuid).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
-                expect(TracingIdentifierUtils.isWithin64Bits(uuid)).toBe(true); // Ensure the value is within 64 bits
-                expect(uuid).toMatch(/^[0-9]+$/); // Ensure the value contains only decimal digits
-            });
-        });
-
         describe('DdRum.addAction', () => {
             test('uses given context when context is valid', async () => {
                 const context = {
@@ -1030,6 +999,124 @@ describe('DdRum', () => {
             expect(PropagatorType.B3).toBe('b3');
             expect(PropagatorType.B3MULTI).toBe('b3multi');
             expect(PropagatorType.TRACECONTEXT).toBe('tracecontext');
+        });
+    });
+
+    describe('DdRum.generateUUID', () => {
+        describe('required types are exposed', () => {
+            it('PropragatorType is exposed', () => {
+                expect(PropagatorType).toBeDefined();
+            });
+
+            it('TracingIdType is exposed', () => {
+                expect(TracingIdType).toBeDefined();
+            });
+        });
+
+        describe('generates a valid trace id', () => {
+            it('in lowDecimal format with Datadog propagator type', () => {
+                let iterations = 100;
+                while (iterations-- > 0) {
+                    const uuidStrLow64 = DdRum.generateUUID(
+                        TracingIdType.trace,
+                        PropagatorType.DATADOG
+                    );
+
+                    expect(uuidStrLow64).toBeDefined(); // Ensure the value is defined
+
+                    expect(
+                        TracingIdentifierUtils.isWithin64Bits(uuidStrLow64)
+                    ).toBe(true);
+                }
+            });
+
+            it('in paddedHex format with B3, B3multi and TraceContext propagator types', () => {
+                let iterations = 100;
+                const randomPropragatorType = [
+                    PropagatorType.B3,
+                    PropagatorType.B3MULTI,
+                    PropagatorType.TRACECONTEXT
+                ];
+                while (iterations-- > 0) {
+                    const uuidPaddedHex = DdRum.generateUUID(
+                        TracingIdType.trace,
+                        randomPropragatorType[
+                            Math.floor(
+                                Math.random() * randomPropragatorType.length
+                            )
+                        ]
+                    );
+
+                    expect(uuidPaddedHex).toBeDefined(); // Ensure the value is defined
+
+                    expect(uuidPaddedHex).toMatch(
+                        /^[0-9a-f]{8}[0]{8}[0-9a-f]{16}$/
+                    );
+                    expect(
+                        TracingIdentifierUtils.isWithin128Bits(
+                            uuidPaddedHex,
+                            16
+                        )
+                    ).toBe(true);
+                }
+            });
+
+            it('falls back to 64 bit span id when wrong tracingIdType is passed', () => {
+                const uuid = DdRum.generateUUID(
+                    ('wrong' as unknown) as TracingIdType,
+                    PropagatorType.DATADOG
+                );
+
+                expect(uuid).toBeDefined(); // Ensure the value is defined
+                expect(BigInt(uuid).greater(BigInt(0))).toBe(true); // Ensure it's a valid positive number
+                expect(TracingIdentifierUtils.isWithin64Bits(uuid)).toBe(true); // Ensure the value is within 64 bits
+                expect(uuid).toMatch(/^[0-9]+$/); // Ensure the value contains only decimal digits
+            });
+        });
+
+        describe('generates a valid span id', () => {
+            it('in Decimal format with Datadog propagator type', () => {
+                let iterations = 100;
+                while (iterations-- > 0) {
+                    const uuid6StrDecimal64 = DdRum.generateUUID(
+                        TracingIdType.span,
+                        PropagatorType.DATADOG
+                    );
+
+                    expect(uuid6StrDecimal64).toBeDefined(); // Ensure the value is defined
+
+                    expect(
+                        TracingIdentifierUtils.isWithin64Bits(uuid6StrDecimal64)
+                    ).toBe(true);
+                }
+            });
+
+            it('in paddedHex format with B3, B3multi and TraceContext propagator types', () => {
+                let iterations = 100;
+                const randomPropragatorType = [
+                    PropagatorType.B3,
+                    PropagatorType.B3MULTI,
+                    PropagatorType.TRACECONTEXT
+                ];
+
+                while (iterations-- > 0) {
+                    const uuidStr128 = DdRum.generateUUID(
+                        TracingIdType.span,
+                        randomPropragatorType[
+                            Math.floor(
+                                Math.random() * randomPropragatorType.length
+                            )
+                        ]
+                    );
+
+                    expect(uuidStr128).toBeDefined(); // Ensure the value is defined
+
+                    expect(uuidStr128).toMatch(/^[0-9a-f]{16}$/);
+                    expect(
+                        TracingIdentifierUtils.isWithin64Bits(uuidStr128, 16)
+                    ).toBe(true);
+                }
+            });
         });
     });
 });
