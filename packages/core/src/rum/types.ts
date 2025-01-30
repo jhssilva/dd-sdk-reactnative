@@ -132,7 +132,7 @@ export type DdRumType = {
     generateUUID(
         type: TracingIdType,
         propagator: PropagatorType
-    ): { resource: string; contextPropagation: string } | undefined;
+    ): { resource: string; contextPropagation: string };
 
     /**
      * Add a RUM Error.

@@ -238,17 +238,20 @@ class DdRumWrapper implements DdRumType {
     generateUUID = (
         type: TracingIdType,
         propagator: PropagatorType
-    ):
-        | {
-              resource: string;
-              contextPropagation: string;
-          }
-        | undefined => {
-        if (type !== TracingIdType.trace && type !== TracingIdType.span) {
+    ): {
+        resource: string;
+        contextPropagation: string;
+    } => {
+        if (!Object.values(TracingIdType).includes(type)) {
             console.warn(
-                `Unsupported tracing ID type '${type}' for generateUUID.`
+                `Unsupported tracing ID type '${type}' provided to generateUUID. Defaulting to 'span' type.`
             );
-            return undefined;
+        }
+
+        if (!Object.values(PropagatorType).includes(propagator)) {
+            console.warn(
+                `Unsupported propagator '${propagator}' provided to generateUUID. Defaulting to 'Tracecontext' propagator.`
+            );
         }
 
         const uuid = this.createUUID(type);
