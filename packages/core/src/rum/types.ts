@@ -129,7 +129,10 @@ export type DdRumType = {
      * @param propragator - The propagator to use for the generated tracing ID. Datadog, TraceContext, B3 or B3Multi.
      * @returns The generated tracing ID.
      */
-    generateUUID(type: TracingIdType, propagator: PropagatorType): string;
+    generateUUID(
+        type: TracingIdType,
+        propagator: PropagatorType
+    ): { resource: string; contextPropagation: string } | undefined;
 
     /**
      * Add a RUM Error.

@@ -238,18 +238,29 @@ class DdRumWrapper implements DdRumType {
     generateUUID = (
         type: TracingIdType,
         propagator: PropagatorType
-    ): string => {
+    ):
+        | {
+              resource: string;
+              contextPropagation: string;
+          }
+        | undefined => {
         if (type !== TracingIdType.trace && type !== TracingIdType.span) {
             console.warn(
-                `Unsupported tracing ID type '${type}' for generateUUID. Falling back to 64 bit Span ID in Decimal Format.`
+                `Unsupported tracing ID type '${type}' for generateUUID.`
             );
-            return TracingIdentifier.createSpanId().toString(
-                TracingIdFormat.decimal
-            );
+            return undefined;
         }
 
-        const tempUUID = this.createUUID(type);
-        return this.formatUUID(tempUUID, type, propagator);
+        const uuid = this.createUUID(type);
+
+        return {
+            resource: this.formatUUIDForResource(uuid, type),
+            contextPropagation: this.formatUUIDForContextPropagation(
+                uuid,
+                type,
+                propagator
+            )
+        };
     };
 
     private createUUID(type: TracingIdType): TraceId | SpanId {
@@ -258,7 +269,18 @@ class DdRumWrapper implements DdRumType {
             : TracingIdentifier.createSpanId();
     }
 
-    private formatUUID(
+    private formatUUIDForResource(
+        id: TraceId | SpanId,
+        type: TracingIdType
+    ): string {
+        if (type === TracingIdType.trace) {
+            return id.toString(TracingIdFormat.paddedHex);
+        }
+
+        return id.toString(TracingIdFormat.decimal);
+    }
+
+    private formatUUIDForContextPropagation(
         id: TraceId | SpanId,
         type: TracingIdType,
         propagator: PropagatorType
