@@ -23,19 +23,21 @@ import type { ErrorEventMapper } from './eventMappers/errorEventMapper';
 import { generateErrorEventMapper } from './eventMappers/errorEventMapper';
 import type { ResourceEventMapper } from './eventMappers/resourceEventMapper';
 import { generateResourceEventMapper } from './eventMappers/resourceEventMapper';
+import type {
+    SpanId,
+    TraceId
+} from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
 import {
     TracingIdFormat,
     TracingIdType,
-    TracingIdentifier,
-    type SpanId,
-    type TraceId
+    TracingIdentifier
 } from './instrumentation/resourceTracking/distributedTracing/TracingIdentifier';
-import {
-    type ErrorSource,
-    type DdRumType,
-    type RumActionType,
-    type ResourceKind,
-    PropagatorType
+import { PropagatorType } from './types';
+import type {
+    ErrorSource,
+    DdRumType,
+    RumActionType,
+    ResourceKind
 } from './types';
 
 const generateEmptyPromise = () => new Promise<void>(resolve => resolve());
@@ -233,12 +235,17 @@ class DdRumWrapper implements DdRumType {
         );
     };
 
-    generateUUID = (type: TracingIdType, propagator: PropagatorType): string => {
+    generateUUID = (
+        type: TracingIdType,
+        propagator: PropagatorType
+    ): string => {
         if (type !== TracingIdType.trace && type !== TracingIdType.span) {
             console.warn(
                 `Unsupported tracing ID type '${type}' for generateUUID. Falling back to 64 bit Span ID in Decimal Format.`
             );
-            return TracingIdentifier.createSpanId().toString(TracingIdFormat.decimal);
+            return TracingIdentifier.createSpanId().toString(
+                TracingIdFormat.decimal
+            );
         }
 
         const tempUUID = this.createUUID(type);
@@ -251,11 +258,17 @@ class DdRumWrapper implements DdRumType {
             : TracingIdentifier.createSpanId();
     }
 
-    private formatUUID(id: TraceId | SpanId, type: TracingIdType, propagator: PropagatorType): string {
+    private formatUUID(
+        id: TraceId | SpanId,
+        type: TracingIdType,
+        propagator: PropagatorType
+    ): string {
         if (propagator === PropagatorType.DATADOG) {
-            return id.toString(type === TracingIdType.trace
-                ? TracingIdFormat.lowDecimal
-                : TracingIdFormat.decimal);
+            return id.toString(
+                type === TracingIdType.trace
+                    ? TracingIdFormat.lowDecimal
+                    : TracingIdFormat.decimal
+            );
         }
         return id.toString(TracingIdFormat.paddedHex);
     }
