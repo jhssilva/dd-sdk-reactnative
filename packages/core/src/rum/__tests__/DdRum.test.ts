@@ -1001,20 +1001,19 @@ describe('DdRum', () => {
             expect(PropagatorType.TRACECONTEXT).toBe('tracecontext');
         });
     });
-
     describe('DdRum.generateUUID', () => {
-        describe('required types are exposed', () => {
-            it('PropagatorType is exposed', () => {
+        describe('Types and Enums', () => {
+            it('exposes PropagatorType enum', () => {
                 expect(PropagatorType).toBeDefined();
             });
 
-            it('TracingIdType is exposed', () => {
+            it('exposes TracingIdType enum', () => {
                 expect(TracingIdType).toBeDefined();
             });
         });
 
-        describe('attributes not defined', () => {
-            it('falls back to 64 bit span id when wrong tracingIdType is passed', () => {
+        describe('Default behavior with invalid input', () => {
+            it('generates 64-bit span id when passed invalid tracing id type', () => {
                 const randomPropagatorType = Object.values(PropagatorType);
 
                 for (let i = 0; i < 100; i++) {
@@ -1032,19 +1031,15 @@ describe('DdRum', () => {
 
                     const uuidPropagator = uuid.contextPropagation;
 
-                    expect(uuidPropagator).toBeDefined(); // Ensure the value is defined
+                    expect(uuidPropagator).toBeDefined();
 
-                    // IF it's Datadog propagator, the contextPropagation should be a valid Decimal positive number
                     if (tempContextPropagator === PropagatorType.DATADOG) {
-                        // Decimal
                         expect(
                             TracingIdentifierUtils.isWithin64Bits(
                                 uuidPropagator
                             )
                         ).toBe(true);
                     } else {
-                        // IF it's not Datadog propagator, the contextPropagation should be a valid paddedHex
-                        // Paddex
                         expect(uuidPropagator).toMatch(/^[0-9a-f]{16}$/);
                         expect(
                             TracingIdentifierUtils.isWithin64Bits(
@@ -1055,9 +1050,7 @@ describe('DdRum', () => {
                     }
 
                     const uuidDecimal = uuid.resource;
-                    // Validate resource
-                    expect(uuidDecimal).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidDecimal).toBeDefined();
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(uuidDecimal)
                     ).toBe(true);
@@ -1065,8 +1058,8 @@ describe('DdRum', () => {
             });
         });
 
-        describe('generates a valid trace id', () => {
-            it('in lowDecimal format with Datadog propagator type', () => {
+        describe('Trace ID generation', () => {
+            it('generates valid 128-bit trace ID in decimal format for Datadog propagator', () => {
                 let iterations = 100;
                 while (iterations-- > 0) {
                     const uuidObject = DdRum.generateUUID(
@@ -1074,22 +1067,17 @@ describe('DdRum', () => {
                         PropagatorType.DATADOG
                     );
 
-                    // Test the Propagator
                     const uuidStrLow64Propagator =
                         uuidObject.contextPropagation;
-
-                    expect(uuidStrLow64Propagator).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidStrLow64Propagator).toBeDefined();
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(
                             uuidStrLow64Propagator
                         )
                     ).toBe(true);
 
-                    // Test the Resource
                     const uuidPaddedHexResource = uuidObject.resource;
-                    expect(uuidPaddedHexResource).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidPaddedHexResource).toBeDefined();
                     expect(uuidPaddedHexResource).toMatch(
                         /^[0-9a-f]{8}[0]{8}[0-9a-f]{16}$/
                     );
@@ -1102,18 +1090,18 @@ describe('DdRum', () => {
                 }
             });
 
-            it('in paddedHex format with B3, B3multi and TraceContext propagator types', () => {
+            it('generates valid 128-bit trace ID in hex format for B3, B3multi and TraceContext', () => {
                 let iterations = 100;
 
-                const randomPropagatorType = Object.values(
+                const nonDatadogPropagators = Object.values(
                     PropagatorType
                 ).filter(type => type !== PropagatorType.DATADOG);
 
                 while (iterations-- > 0) {
                     const tempPropagatorType =
-                        randomPropagatorType[
+                        nonDatadogPropagators[
                             Math.floor(
-                                Math.random() * randomPropagatorType.length
+                                Math.random() * nonDatadogPropagators.length
                             )
                         ];
 
@@ -1122,12 +1110,9 @@ describe('DdRum', () => {
                         tempPropagatorType
                     );
 
-                    // Test the Propagator
                     const uuidPaddedHexPropagation =
                         uuidObject.contextPropagation;
-
-                    expect(uuidPaddedHexPropagation).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidPaddedHexPropagation).toBeDefined();
                     expect(uuidPaddedHexPropagation).toMatch(
                         /^[0-9a-f]{8}[0]{8}[0-9a-f]{16}$/
                     );
@@ -1138,10 +1123,8 @@ describe('DdRum', () => {
                         )
                     ).toBe(true);
 
-                    // Test the Resource
                     const uuidPaddedHexResource = uuidObject.resource;
-                    expect(uuidPaddedHexResource).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidPaddedHexResource).toBeDefined();
                     expect(uuidPaddedHexResource).toMatch(
                         /^[0-9a-f]{8}[0]{8}[0-9a-f]{16}$/
                     );
@@ -1155,8 +1138,8 @@ describe('DdRum', () => {
             });
         });
 
-        describe('generates a valid span id', () => {
-            it('in Decimal format with Datadog propagator type', () => {
+        describe('Span ID generation', () => {
+            it('generates valid 64-bit span ID in decimal format for Datadog propagator', () => {
                 let iterations = 100;
                 while (iterations-- > 0) {
                     const uuidObject = DdRum.generateUUID(
@@ -1164,22 +1147,16 @@ describe('DdRum', () => {
                         PropagatorType.DATADOG
                     );
 
-                    // Test the Propagator
                     const uuid6StrDecimal64Propagator = uuidObject.resource;
-
-                    expect(uuid6StrDecimal64Propagator).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuid6StrDecimal64Propagator).toBeDefined();
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(
                             uuid6StrDecimal64Propagator
                         )
                     ).toBe(true);
 
-                    // Test the Resource
                     const uuid6StrDecimal64Resource = uuidObject.resource;
-
-                    expect(uuid6StrDecimal64Resource).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuid6StrDecimal64Resource).toBeDefined();
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(
                             uuid6StrDecimal64Resource
@@ -1188,17 +1165,17 @@ describe('DdRum', () => {
                 }
             });
 
-            it('in paddedHex format with B3, B3multi and TraceContext propagator types', () => {
+            it('generates valid 64-bit span ID in hex format for B3, B3multi and TraceContext', () => {
                 let iterations = 100;
-                const randomPropagatorType = Object.values(
+                const nonDatadogPropagators = Object.values(
                     PropagatorType
                 ).filter(type => type !== PropagatorType.DATADOG);
 
                 while (iterations-- > 0) {
                     const tempPropagatorType =
-                        randomPropagatorType[
+                        nonDatadogPropagators[
                             Math.floor(
-                                Math.random() * randomPropagatorType.length
+                                Math.random() * nonDatadogPropagators.length
                             )
                         ];
 
@@ -1207,10 +1184,8 @@ describe('DdRum', () => {
                         tempPropagatorType
                     );
 
-                    // Test the Propagator
                     const uuidPaddedHexPropagation =
                         uuidObject.contextPropagation;
-
                     expect(uuidPaddedHexPropagation).toMatch(/^[0-9a-f]{16}$/);
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(
@@ -1219,11 +1194,8 @@ describe('DdRum', () => {
                         )
                     ).toBe(true);
 
-                    // Test the Resource (decimal)
                     const uuidDecimalResource = uuidObject.resource;
-
-                    expect(uuidDecimalResource).toBeDefined(); // Ensure the value is defined
-
+                    expect(uuidDecimalResource).toBeDefined();
                     expect(
                         TracingIdentifierUtils.isWithin64Bits(
                             uuidDecimalResource
